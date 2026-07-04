@@ -3,7 +3,9 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  base: "./",
+  // GitHub Pages のプロジェクトサイト（/<repo>/）用。CI で BASE_PATH を渡す。
+  // ローカル（dev/preview）は "/" で動作。
+  base: process.env.BASE_PATH || "/",
   plugins: [
     react(),
     VitePWA({

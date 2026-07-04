@@ -65,6 +65,25 @@ python3 scripts/fetch_pokefuta.py
 
 - No.448 ポケパーク カントー … 公式は市区町村が施設名だが、実際の所在地は東京都稲城市。
 
+## 公開（GitHub Pages）
+
+`.github/workflows/deploy-pages.yml` が main への push 時（およびデータ自動更新の完了時）に
+ビルドして GitHub Pages へデプロイする。URL は `https://<ユーザー名>.github.io/<リポジトリ名>/`。
+
+初回のみ:
+
+1. GitHub にリポジトリを push（無料プランで Pages を使うなら public リポジトリ）
+2. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定
+3. Actions が完了すると公開される
+
+スマホでの利用（PWA としてホーム画面へ追加）:
+
+- iPhone (Safari): 公開 URL を開く → 共有 → 「ホーム画面に追加」
+- Android (Chrome): メニュー → 「アプリをインストール」
+
+> 取得済みチェックは各端末のブラウザ（localStorage）に保存されるため、サイトが公開でも
+> チェック内容は自分の端末内で完結する。
+
 ## Google マップへの取込
 
 `data/pokefuta.csv` を [Google マイマップ](https://mymaps.google.com) にインポート →

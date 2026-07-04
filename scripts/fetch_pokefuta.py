@@ -27,6 +27,12 @@ BASE = "https://local.pokemon.jp"
 MAX_ID = 500  # 現行の最大は 480。追加分を自動検出できるよう少し上まで走査する。
 ROOT = Path(__file__).resolve().parent.parent
 
+# 公式データが不正確で手動修正しているため、fetch で上書きしないポケふた。
+# 既存の data/pokefuta.json の該当レコードをそのまま引き継ぐ。
+#   No.448 ポケパーク カントー: 公式は市区町村が施設名「ポケパーク カントー」だが
+#   実際の所在地は東京都稲城市。手動修正を優先する。
+PRESERVE: set[int] = {448}
+
 
 def fetch(i: int) -> str:
     url = f"{BASE}/manhole/desc/{i}/?is_modal=1"
@@ -87,6 +93,16 @@ def main():
 
     data_dir = ROOT / "data"
     data_dir.mkdir(exist_ok=True)
+
+    # 手動修正済みレコードは既存の canonical データから引き継ぐ（上書きしない）
+    canonical = data_dir / "pokefuta.json"
+    if PRESERVE and canonical.exists():
+        existing = {r["no"]: r for r in json.loads(canonical.read_text(encoding="utf-8"))}
+        kept = [n for n in PRESERVE if n in existing]
+        recs = [existing[r["no"]] if r["no"] in PRESERVE and r["no"] in existing else r
+                for r in recs]
+        if kept:
+            print(f"手動修正を保持: {sorted(kept)}", file=sys.stderr)
 
     # 1) 生データ（canonical）
     (data_dir / "pokefuta.json").write_text(

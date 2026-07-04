@@ -58,6 +58,13 @@ python3 scripts/fetch_pokefuta.py
 公式の個別ページ（`/manhole/desc/{id}/`）を ID 順に走査するため、追加されたばかりで
 検索に未反映のポケふたも確実に取得できる。
 
+### 手動修正の保持
+
+公式データが不正確なポケふたは、`fetch_pokefuta.py` の `PRESERVE`（manhole 番号の集合）に
+登録すると、再取得時に既存の `data/pokefuta.json` の値をそのまま引き継ぎ、上書きしない。
+
+- No.448 ポケパーク カントー … 公式は市区町村が施設名だが、実際の所在地は東京都稲城市。
+
 ## Google マップへの取込
 
 `data/pokefuta.csv` を [Google マイマップ](https://mymaps.google.com) にインポート →

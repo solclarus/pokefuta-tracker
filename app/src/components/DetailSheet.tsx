@@ -1,4 +1,4 @@
-import type { Pokefuta } from "../types";
+import type { Item } from "../types";
 import { useStore } from "../store";
 
 const IconMap = () => (
@@ -23,9 +23,17 @@ const IconClose = () => (
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
 );
+const BigBall = () => (
+  <svg viewBox="0 0 44 44" className="hero-ball" aria-hidden>
+    <circle cx="22" cy="22" r="20" fill="#fff" />
+    <path d="M2 22a20 20 0 0 1 40 0z" fill="#ff5470" />
+    <rect x="2" y="19.5" width="40" height="5" fill="#1c212d" />
+    <circle cx="22" cy="22" r="6" fill="#fff" stroke="#1c212d" strokeWidth="3" />
+  </svg>
+);
 
-export function DetailSheet({ rec }: { rec: Pokefuta | null }) {
-  const collected = useStore((s) => s.collected);
+export function DetailSheet({ rec }: { rec: Item | null }) {
+  const collected = useStore((s) => s.collected[s.category]);
   const toggleCollected = useStore((s) => s.toggleCollected);
   const select = useStore((s) => s.select);
 
@@ -43,12 +51,18 @@ export function DetailSheet({ rec }: { rec: Pokefuta | null }) {
         {rec && (
           <div className="sheet-in">
             <div className={`hero-wrap ${done ? "done" : ""}`}>
-              <img
-                className="hero"
-                src={rec.img}
-                alt=""
-                onError={(e) => (e.currentTarget.style.visibility = "hidden")}
-              />
+              {rec.img ? (
+                <img
+                  className="hero"
+                  src={rec.img}
+                  alt=""
+                  onError={(e) => (e.currentTarget.style.visibility = "hidden")}
+                />
+              ) : (
+                <span className="hero hero-ballwrap">
+                  <BigBall />
+                </span>
+              )}
               {done && (
                 <span className="hero-badge" aria-label="取得済み">
                   <IconCheck />
@@ -57,17 +71,21 @@ export function DetailSheet({ rec }: { rec: Pokefuta | null }) {
             </div>
 
             <div className="sheet-title">
-              <div className="overline">{rec.pref}</div>
-              <h2>{rec.city}</h2>
+              <div className="overline">{rec.name ? `${rec.pref}${rec.city}` : rec.pref}</div>
+              <h2>{rec.name ?? rec.city}</h2>
             </div>
 
-            <div className="chips">
-              {rec.pokemon.map((p, i) => (
-                <span key={i} className="chip">
-                  {p}
-                </span>
-              ))}
-            </div>
+            {(rec.pokemon?.length || rec.addr) && (
+              <div className="chips">
+                {rec.pokemon
+                  ? rec.pokemon.map((p, i) => (
+                      <span key={i} className="chip">
+                        {p}
+                      </span>
+                    ))
+                  : rec.addr && <span className="chip chip-addr">{rec.addr}</span>}
+              </div>
+            )}
 
             <div className="sheet-divider" />
 
@@ -97,7 +115,7 @@ export function DetailSheet({ rec }: { rec: Pokefuta | null }) {
               </a>
               <a
                 className="ghost-btn"
-                href={`https://local.pokemon.jp/manhole/desc/${rec.no}/`}
+                href={rec.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="公式ページを開く"

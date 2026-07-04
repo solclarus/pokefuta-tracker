@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet.markercluster";
-import type { Pokefuta } from "../types";
+import type { Category, Item } from "../types";
 import { useStore } from "../store";
 
 const TILES = {
@@ -10,21 +10,24 @@ const TILES = {
   light: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
 };
 
-function pinIcon(rec: Pokefuta, done: boolean) {
+// ポケセン用のポケボール型ピン（画像を持たないアイテム向け）
+const BALL = `<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="#fff"/><path d="M2 22a20 20 0 0 1 40 0z" fill="#ff5470"/><rect x="2" y="19.5" width="40" height="5" fill="#1c212d"/><circle cx="22" cy="22" r="6" fill="#fff" stroke="#1c212d" stroke-width="3"/></svg>`;
+
+function pinIcon(rec: Item, done: boolean) {
+  const inner = rec.img
+    ? `<img src="${rec.thumb}" loading="lazy" onerror="this.src='${rec.img}'" />`
+    : `<span class="ball">${BALL}</span>`;
   return L.divIcon({
     className: "",
-    html: `<div class="pin ${done ? "done" : ""}">
-      <img src="${rec.thumb}" loading="lazy" onerror="this.src='${rec.img}'" />
-      <span class="tip"></span>
-    </div>`,
+    html: `<div class="pin ${done ? "done" : ""}">${inner}<span class="tip"></span></div>`,
     iconSize: [46, 46],
     iconAnchor: [23, 52],
   });
 }
 
-function ClusterLayer({ data }: { data: Pokefuta[] }) {
+function ClusterLayer({ data }: { data: Item[] }) {
   const map = useMap();
-  const collected = useStore((s) => s.collected);
+  const collected = useStore((s) => s.collected[s.category]);
   const select = useStore((s) => s.select);
 
   useEffect(() => {
@@ -66,7 +69,7 @@ function ClusterLayer({ data }: { data: Pokefuta[] }) {
   return null;
 }
 
-function FlyTo({ data }: { data: Pokefuta[] }) {
+function FlyTo({ data }: { data: Item[] }) {
   const map = useMap();
   const selected = useStore((s) => s.selected);
   useEffect(() => {
@@ -74,6 +77,19 @@ function FlyTo({ data }: { data: Pokefuta[] }) {
     const rec = data.find((r) => r.no === selected);
     if (rec) map.flyTo([rec.lat, rec.lng], Math.max(map.getZoom(), 12), { duration: 0.6 });
   }, [map, selected, data]);
+  return null;
+}
+
+// カテゴリ切替時に全アイテムが収まるよう地図を合わせる
+function FitOnCategory({ data, category }: { data: Item[]; category: Category }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!data.length) return;
+    const bounds = L.latLngBounds(data.map((r) => [r.lat, r.lng] as [number, number]));
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8, animate: true });
+    // data ではなく category の変化時のみ実行
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
   return null;
 }
 
@@ -106,7 +122,7 @@ function UserMarker() {
   return null;
 }
 
-export function MapView({ data }: { data: Pokefuta[] }) {
+export function MapView({ data, category }: { data: Item[]; category: Category }) {
   const theme = useStore((s) => s.theme);
   return (
     <div className="map-wrap">
@@ -128,6 +144,7 @@ export function MapView({ data }: { data: Pokefuta[] }) {
         />
         <ClusterLayer data={data} />
         <FlyTo data={data} />
+        <FitOnCategory data={data} category={category} />
         <UserMarker />
       </MapContainer>
     </div>

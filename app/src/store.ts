@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { FilterMode, Theme, ViewMode } from "./types";
+import type { Category, FilterMode, Theme, ViewMode } from "./types";
+
+type CollectedMap = Record<number, true>;
 
 interface State {
-  collected: Record<number, true>;
+  category: Category;
+  collected: Record<Category, CollectedMap>;
   theme: Theme;
   filter: FilterMode;
   query: string;
@@ -11,6 +14,7 @@ interface State {
   statsOpen: boolean;
   view: ViewMode;
   userPos: [number, number] | null;
+  setCategory: (c: Category) => void;
   toggleCollected: (no: number) => void;
   setTheme: (t: Theme) => void;
   toggleTheme: () => void;
@@ -29,7 +33,8 @@ const systemTheme = (): Theme =>
 export const useStore = create<State>()(
   persist(
     (set, get) => ({
-      collected: {},
+      category: "pokefuta",
+      collected: { pokefuta: {}, pokecen: {} },
       theme: systemTheme(),
       filter: "all",
       query: "",
@@ -37,12 +42,13 @@ export const useStore = create<State>()(
       statsOpen: false,
       view: "map",
       userPos: null,
+      setCategory: (category) => set({ category, selected: null, query: "" }),
       toggleCollected: (no) =>
         set((s) => {
-          const next = { ...s.collected };
-          if (next[no]) delete next[no];
-          else next[no] = true;
-          return { collected: next };
+          const cur = { ...s.collected[s.category] };
+          if (cur[no]) delete cur[no];
+          else cur[no] = true;
+          return { collected: { ...s.collected, [s.category]: cur } };
         }),
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
@@ -56,7 +62,24 @@ export const useStore = create<State>()(
     }),
     {
       name: "pokefuta_v1",
-      partialize: (s) => ({ collected: s.collected, theme: s.theme }),
+      version: 2,
+      partialize: (s) => ({
+        collected: s.collected,
+        theme: s.theme,
+        category: s.category,
+      }),
+      migrate: (persisted, version) => {
+        const p = persisted as { collected?: Record<string, unknown> } | undefined;
+        if (p && version < 2) {
+          const old = p.collected ?? {};
+          const isFlat = !("pokefuta" in old) && !("pokecen" in old);
+          p.collected = {
+            pokefuta: (isFlat ? old : (old as Record<string, CollectedMap>).pokefuta) ?? {},
+            pokecen: (old as Record<string, CollectedMap>).pokecen ?? {},
+          };
+        }
+        return p as unknown;
+      },
     }
   )
 );

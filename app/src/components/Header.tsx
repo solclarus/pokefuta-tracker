@@ -1,5 +1,6 @@
 import { useStore } from "../store";
 import type { FilterMode } from "../types";
+import { CATEGORIES, CATEGORY_LABEL } from "../items";
 
 const FILTERS: { key: FilterMode; label: string }[] = [
   { key: "all", label: "全て" },
@@ -28,7 +29,9 @@ const IconMoon = () => (
 );
 
 export function Header({ total, shown }: { total: number; shown: number }) {
-  const collected = useStore((s) => s.collected);
+  const category = useStore((s) => s.category);
+  const setCategory = useStore((s) => s.setCategory);
+  const collected = useStore((s) => s.collected[s.category]);
   const filter = useStore((s) => s.filter);
   const query = useStore((s) => s.query);
   const theme = useStore((s) => s.theme);
@@ -43,11 +46,19 @@ export function Header({ total, shown }: { total: number; shown: number }) {
   return (
     <header className="header">
       <div className="header-top">
-        <div className="brand">
+        <div className="cat-switch" role="tablist" aria-label="カテゴリ">
           <span className="logo" aria-hidden />
-          <span className="brand-txt">
-            ポケ<b>ふた</b>
-          </span>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c}
+              className={category === c ? "on" : ""}
+              onClick={() => setCategory(c)}
+              role="tab"
+              aria-selected={category === c}
+            >
+              {CATEGORY_LABEL[c]}
+            </button>
+          ))}
         </div>
 
         <div className="progress" title={`表示中 ${shown} 件`}>
@@ -73,7 +84,7 @@ export function Header({ total, shown }: { total: number; shown: number }) {
         <input
           className="search"
           type="search"
-          placeholder="県・市・ポケモンで検索"
+          placeholder={category === "pokefuta" ? "県・市・ポケモンで検索" : "施設名・県で検索"}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

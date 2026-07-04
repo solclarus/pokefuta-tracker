@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Pokefuta } from "../types";
+import type { Item } from "../types";
 import { useStore } from "../store";
 import { REGION_ORDER, regionOf, type Region } from "../regions";
 
@@ -22,10 +22,10 @@ function Bar({ c }: { c: Cnt }) {
   );
 }
 
-export function StatsPanel({ data }: { data: Pokefuta[] }) {
+export function StatsPanel({ data }: { data: Item[] }) {
   const open = useStore((s) => s.statsOpen);
   const setOpen = useStore((s) => s.setStatsOpen);
-  const collected = useStore((s) => s.collected);
+  const collected = useStore((s) => s.collected[s.category]);
   const setQuery = useStore((s) => s.setQuery);
   const setFilter = useStore((s) => s.setFilter);
   const [expanded, setExpanded] = useState<Region | null>(null);

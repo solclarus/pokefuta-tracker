@@ -93,6 +93,24 @@ function FitOnCategory({ data, category }: { data: Item[]; category: Category })
   return null;
 }
 
+// モバイルのツールバー開閉やアドレスバーの伸縮で高さが変わったとき、
+// Leaflet の内部サイズを更新して下部のタイル欠けを防ぐ
+function ResizeFix() {
+  const map = useMap();
+  useEffect(() => {
+    const fix = () => map.invalidateSize();
+    window.addEventListener("resize", fix);
+    window.addEventListener("orientationchange", fix);
+    const t = setTimeout(fix, 300);
+    return () => {
+      window.removeEventListener("resize", fix);
+      window.removeEventListener("orientationchange", fix);
+      clearTimeout(t);
+    };
+  }, [map]);
+  return null;
+}
+
 const userIcon = L.divIcon({
   className: "",
   html: `<div class="user-dot"><span class="pulse"></span></div>`,
@@ -145,6 +163,7 @@ export function MapView({ data, category }: { data: Item[]; category: Category }
         <ClusterLayer data={data} />
         <FlyTo data={data} />
         <FitOnCategory data={data} category={category} />
+        <ResizeFix />
         <UserMarker />
       </MapContainer>
     </div>

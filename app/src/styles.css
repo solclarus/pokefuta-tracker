@@ -52,7 +52,11 @@ body {
 }
 .app {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh; /* fallback */
+  height: 100dvh; /* モバイルのツールバー表示分を除いた実高さ */
   display: flex;
   flex-direction: column;
 }
@@ -60,9 +64,9 @@ body {
 /* ---------- HUD（地図上に浮かぶカテゴリ切替＋進捗） ---------- */
 .hud {
   position: absolute;
-  top: calc(10px + env(safe-area-inset-top));
-  left: 12px;
-  right: 12px;
+  top: calc(12px + env(safe-area-inset-top));
+  left: calc(12px + env(safe-area-inset-left));
+  right: calc(12px + env(safe-area-inset-right));
   z-index: 800;
   display: flex;
   align-items: flex-start;
@@ -121,7 +125,7 @@ body {
   color: #fff;
 }
 
-/* progress pill */
+/* progress pill (tap で達成率パネル) */
 .progress-pill {
   display: flex;
   align-items: center;
@@ -131,6 +135,16 @@ body {
   border-radius: 20px;
   padding: 4px 12px 4px 5px;
   box-shadow: var(--shadow);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: 0.14s;
+}
+.progress-pill:hover {
+  border-color: var(--accent);
+}
+.progress-pill:active {
+  transform: scale(0.96);
 }
 .pp-ring {
   width: 30px;

@@ -22,14 +22,6 @@ const IconLocate = () => (
     <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
   </svg>
 );
-const IconChart = () => (
-  <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3v18h18" />
-    <rect x="7" y="12" width="3" height="6" rx="0.5" />
-    <rect x="12" y="8" width="3" height="10" rx="0.5" />
-    <rect x="17" y="5" width="3" height="13" rx="0.5" />
-  </svg>
-);
 const IconSun = () => (
   <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="4" />
@@ -66,7 +58,6 @@ export function Fabs() {
   const setQuery = useStore((s) => s.setQuery);
   const theme = useStore((s) => s.theme);
   const toggleTheme = useStore((s) => s.toggleTheme);
-  const setStatsOpen = useStore((s) => s.setStatsOpen);
   const category = useStore((s) => s.category);
 
   const [locating, setLocating] = useState(false);
@@ -115,9 +106,6 @@ export function Fabs() {
       <div className="fabs">
         <button className="fab" onClick={toggleTheme} title="テーマ切替" aria-label="テーマ切替">
           {theme === "dark" ? <IconSun /> : <IconMoon />}
-        </button>
-        <button className="fab" onClick={() => setStatsOpen(true)} title="達成率" aria-label="達成率">
-          <IconChart />
         </button>
         <button
           className={`fab ${query ? "active" : ""}`}

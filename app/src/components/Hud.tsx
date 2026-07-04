@@ -7,6 +7,7 @@ export function Hud({ total }: { total: number }) {
   const category = useStore((s) => s.category);
   const setCategory = useStore((s) => s.setCategory);
   const collected = useStore((s) => s.collected[s.category]);
+  const setStatsOpen = useStore((s) => s.setStatsOpen);
 
   const done = Object.keys(collected).length;
   const pct = total ? Math.round((done / total) * 1000) / 10 : 0;
@@ -28,7 +29,12 @@ export function Hud({ total }: { total: number }) {
         ))}
       </div>
 
-      <div className="progress-pill" title={`取得 ${done} / ${total}`}>
+      <button
+        className="progress-pill"
+        onClick={() => setStatsOpen(true)}
+        title="達成率を見る"
+        aria-label={`達成率 ${pct}%（取得 ${done} / ${total}）`}
+      >
         <span className="pp-ring" style={{ "--p": `${pct}%` } as CSSProperties}>
           <span className="pp-pct">{Math.round(pct)}</span>
         </span>
@@ -36,7 +42,7 @@ export function Hud({ total }: { total: number }) {
           <b>{done}</b>
           <span className="muted">/{total}</span>
         </span>
-      </div>
+      </button>
     </div>
   );
 }

@@ -9,7 +9,7 @@
 pokefuta-tracker/
 ├─ app/      React アプリ（Vite + React + TypeScript）
 ├─ data/     取得データ（canonical JSON）
-└─ scripts/  データ取得・アイコン生成
+└─ scripts/  データ取得・差分レポート
 ```
 
 ## 開発

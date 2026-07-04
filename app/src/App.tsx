@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { ITEMS } from "./items";
 import type { Item } from "./types";
 import { useStore } from "./store";
-import { Header } from "./components/Header";
+import { Hud } from "./components/Hud";
 import { MapView } from "./components/MapView";
 import { ListView } from "./components/ListView";
 import { Fabs } from "./components/Fabs";
@@ -44,10 +44,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header total={data.length} shown={filtered.length} />
       <div className="stage">
         <MapView data={filtered} category={category} />
         {view === "list" && <ListView data={filtered} />}
+        <Hud total={data.length} />
         <Fabs />
       </div>
       <DetailSheet rec={selectedRec} />

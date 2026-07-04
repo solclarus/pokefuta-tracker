@@ -75,17 +75,15 @@ export function DetailSheet({ rec }: { rec: Item | null }) {
               <h2>{rec.name ?? rec.city}</h2>
             </div>
 
-            {(rec.pokemon?.length || rec.addr) && (
+            {rec.pokemon?.length ? (
               <div className="chips">
-                {rec.pokemon
-                  ? rec.pokemon.map((p, i) => (
-                      <span key={i} className="chip">
-                        {p}
-                      </span>
-                    ))
-                  : rec.addr && <span className="chip chip-addr">{rec.addr}</span>}
+                {rec.pokemon.map((p, i) => (
+                  <span key={i} className="chip">
+                    {p}
+                  </span>
+                ))}
               </div>
-            )}
+            ) : null}
 
             <div className="sheet-divider" />
 

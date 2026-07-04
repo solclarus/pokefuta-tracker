@@ -709,14 +709,6 @@ body {
   padding: 5px 13px;
   border-radius: 999px;
 }
-.chip-addr {
-  background: var(--panel2);
-  border-color: var(--line);
-  font-weight: 500;
-  color: var(--sub);
-  border-radius: 12px;
-  line-height: 1.5;
-}
 
 /* divider */
 .sheet-divider {

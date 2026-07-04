@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""ポケふた全件データの取得・生成スクリプト。
+
+公式サイト local.pokemon.jp の個別ページ（/manhole/desc/{id}/?is_modal=1）を
+ID 1..MAX_ID まで走査し、実在する全ポケふたを取得する。検索インデックスに
+依存しないため、追加されたばかりの新しいポケふたも確実に拾える。
+
+出力:
+  - data/pokefuta.json          … 全項目の生データ（canonical）
+  - data/pokefuta.csv           … Google マイマップ取込用（UTF-8 BOM）
+  - app/src/data/pokefuta.json  … React アプリが読むデータ（bundle 用）
+
+新しいポケふたが追加されたら、このスクリプトを実行するだけで全成果物が更新される:
+  python3 scripts/fetch_pokefuta.py
+"""
+import urllib.request
+import re
+import json
+import csv
+import html
+import sys
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+
+BASE = "https://local.pokemon.jp"
+MAX_ID = 500  # 現行の最大は 480。追加分を自動検出できるよう少し上まで走査する。
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def fetch(i: int) -> str:
+    url = f"{BASE}/manhole/desc/{i}/?is_modal=1"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    for _ in range(3):
+        try:
+            return urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
+        except Exception:
+            continue
+    return ""
+
+
+def parse(i: int, h: str):
+    m = re.search(r'<div class="detail-manhole">(.*?)</body>', h, re.S)
+    if not m:
+        return None
+    body = m.group(1)
+    h1 = re.search(r"<h1>([^<]*)</h1>", body)
+    title = html.unescape(h1.group(1).strip()) if h1 else ""
+    if not title:  # 存在しない ID（欠番）
+        return None
+    pref, city = (title.split("/", 1) + [""])[:2]
+    coord = re.search(r"maps\.google\.com/maps\?q=([0-9.]+),([0-9.]+)", body)
+    if not coord:
+        return None
+    lat, lng = coord.group(1), coord.group(2)
+    addr_m = re.search(r'<div class="block map">.*?<p>([^<]*)</p>', body, re.S)
+    address = html.unescape(addr_m.group(1).strip()) if addr_m else ""
+    pokes = re.findall(
+        r'zukan\.pokemon\.co\.jp/detail/(\d+)"[^>]*>\s*<span>([^<]+)</span>', body
+    )
+    img_m = re.search(r'<img src="([^"]+_l\.png)"', body)
+    img = (BASE + img_m.group(1)) if img_m else ""
+    return {
+        "no": i,
+        "pref": pref,
+        "city": city,
+        "addr": address,
+        "lat": float(lat),
+        "lng": float(lng),
+        "pokemon": [html.unescape(p[1]) for p in pokes],
+        "zukan": [int(p[0]) for p in pokes],
+        "img": img,
+        "thumb": img.replace("_l.png", "_s.png"),
+    }
+
+
+def work(i: int):
+    h = fetch(i)
+    return parse(i, h) if h else None
+
+
+def main():
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        recs = [r for r in ex.map(work, range(1, MAX_ID + 1)) if r]
+    recs.sort(key=lambda r: r["no"])
+    print(f"取得件数: {len(recs)}  (ID {recs[0]['no']}..{recs[-1]['no']})", file=sys.stderr)
+
+    data_dir = ROOT / "data"
+    data_dir.mkdir(exist_ok=True)
+
+    # 1) 生データ（canonical）
+    (data_dir / "pokefuta.json").write_text(
+        json.dumps(recs, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+
+    # 2) React アプリ用データ（コンパクト）
+    app_data = ROOT / "app" / "src" / "data" / "pokefuta.json"
+    app_data.parent.mkdir(parents=True, exist_ok=True)
+    app_data.write_text(
+        json.dumps(recs, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+    )
+
+    # 3) Google マイマップ取込用 CSV
+    with open(data_dir / "pokefuta.csv", "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(
+            ["name", "latitude", "longitude", "都道府県", "市区町村",
+             "住所", "ポケモン", "画像URL", "詳細URL", "manhole_no"]
+        )
+        for r in recs:
+            pn = "・".join(r["pokemon"])
+            name = f'{r["pref"]}/{r["city"]}' + (f"（{pn}）" if pn else "")
+            w.writerow(
+                [name, r["lat"], r["lng"], r["pref"], r["city"], r["addr"],
+                 pn, r["img"], f'{BASE}/manhole/desc/{r["no"]}/', r["no"]]
+            )
+
+    print("生成: data/pokefuta.json / data/pokefuta.csv / app/src/data/pokefuta.json",
+          file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

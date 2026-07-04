@@ -5,7 +5,7 @@
 ## 構成
 
 ```
-pokefuta/
+pokefuta-tracker/
 ├─ app/                   React アプリ本体（Vite + React + TypeScript）
 │  ├─ public/                 PWA アイコン
 │  └─ src/

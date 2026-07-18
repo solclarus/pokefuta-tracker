@@ -28,7 +28,7 @@ export function ListView({ data }: { data: Item[] }) {
         {data.map((r) => {
           const done = !!collected[r.no];
           const place = r.name ?? `${r.pref}/${r.city}`;
-          const sub = r.pokemon?.join("・") ?? `${r.pref}${r.city}`;
+          const sub = r.pokemon?.map((p) => p.name).join("・") ?? `${r.pref}${r.city}`;
           return (
             <li key={r.no} className={`list-item ${done ? "done" : ""}`}>
               <button className="list-main" onClick={() => select(r.no)}>

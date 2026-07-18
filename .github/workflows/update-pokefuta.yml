@@ -29,7 +29,7 @@ jobs:
       - name: Detect changes
         id: diff
         run: |
-          if [ -z "$(git status --porcelain data app/src/data)" ]; then
+          if [ -z "$(git status --porcelain data)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "変更なし" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -49,7 +49,7 @@ jobs:
             echo
             cat /tmp/report.md
           } > /tmp/commit_msg.txt
-          git add data app/src/data
+          git add data
           git commit -F /tmp/commit_msg.txt
           git push
 

@@ -21,7 +21,7 @@ def load(path: str) -> dict:
 
 
 def fmt(r: dict) -> str:
-    pk = "・".join(r.get("pokemon", []))
+    pk = "・".join(p["name"] for p in r.get("pokemon", []))
     return f"- No.{r['no']} {r['pref']}/{r['city']}" + (f"（{pk}）" if pk else "")
 
 

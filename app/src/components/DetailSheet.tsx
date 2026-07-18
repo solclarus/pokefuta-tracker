@@ -79,7 +79,7 @@ export function DetailSheet({ rec }: { rec: Item | null }) {
               <div className="chips">
                 {rec.pokemon.map((p, i) => (
                   <span key={i} className="chip">
-                    {p}
+                    {p.name}
                   </span>
                 ))}
               </div>

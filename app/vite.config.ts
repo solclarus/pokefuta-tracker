@@ -6,6 +6,8 @@ export default defineConfig({
   // GitHub Pages のプロジェクトサイト（/<repo>/）用。CI で BASE_PATH を渡す。
   // ローカル（dev/preview）は "/" で動作。
   base: process.env.BASE_PATH || "/",
+  // dev サーバがリポジトリ直下の data/ を import できるようにする
+  server: { fs: { allow: [".."] } },
   plugins: [
     react(),
     VitePWA({

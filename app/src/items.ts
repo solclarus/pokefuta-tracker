@@ -1,10 +1,10 @@
-import pokefutaRaw from "./data/pokefuta.json";
-import pokecenRaw from "./data/pokecen.json";
-import type { Category, Item } from "./types";
+import pokefutaRaw from "../../data/pokefuta.json";
+import pokecenRaw from "../../data/pokecen.json";
+import type { Category, Item, PokemonRef } from "./types";
 
 interface PokefutaRaw {
   no: number; pref: string; city: string; addr: string;
-  lat: number; lng: number; pokemon: string[]; zukan: number[];
+  lat: number; lng: number; pokemon: PokemonRef[];
   img: string; thumb: string;
 }
 interface PokecenRaw {
@@ -16,7 +16,7 @@ const pokefuta: Item[] = (pokefutaRaw as PokefutaRaw[]).map((r) => ({
   category: "pokefuta",
   no: r.no, pref: r.pref, city: r.city, addr: r.addr, lat: r.lat, lng: r.lng,
   url: `https://local.pokemon.jp/manhole/desc/${r.no}/`,
-  pokemon: r.pokemon, zukan: r.zukan, img: r.img, thumb: r.thumb,
+  pokemon: r.pokemon, img: r.img, thumb: r.thumb,
 }));
 
 const pokecen: Item[] = (pokecenRaw as PokecenRaw[]).map((r) => ({

@@ -10,7 +10,7 @@ import { DetailSheet } from "./components/DetailSheet";
 import { StatsPanel } from "./components/StatsPanel";
 
 const searchText = (r: Item) =>
-  (r.pref + r.city + r.addr + (r.name ?? "") + (r.pokemon?.join("") ?? "")).toLowerCase();
+  (r.pref + r.city + r.addr + (r.name ?? "") + (r.pokemon?.map((p) => p.name).join("") ?? "")).toLowerCase();
 
 export default function App() {
   const theme = useStore((s) => s.theme);

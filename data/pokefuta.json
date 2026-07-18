@@ -1118,7 +1118,16 @@
   "addr": "北海道稚内市中央3-5",
   "lat": 45.417236,
   "lng": 141.677095,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラロコン",
+    "dex": 37
+   },
+   {
+    "name": "アローラキュウコン",
+    "dex": 38
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/92f6a149a9614bf12a606d2c691f4def_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/92f6a149a9614bf12a606d2c691f4def_s.png"
  },
@@ -1873,7 +1882,16 @@
   "addr": "鳥取県八頭町徳丸625",
   "lat": 35.366456,
   "lng": 134.339426,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラサンド",
+    "dex": 27
+   },
+   {
+    "name": "アローラサンドパン",
+    "dex": 28
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/e4cc762f5c45d2e3b1c89fe016cad306_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/e4cc762f5c45d2e3b1c89fe016cad306_s.png"
  },
@@ -2984,7 +3002,16 @@
   "addr": "宮崎県高鍋町大字蚊口浦字蚊口6259-1",
   "lat": 32.115956,
   "lng": 131.532841,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラナッシー",
+    "dex": 103
+   },
+   {
+    "name": "アローラライチュウ",
+    "dex": 26
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/7020590767375a1d51a3bb6af9b37edf_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/7020590767375a1d51a3bb6af9b37edf_s.png"
  },
@@ -3403,7 +3430,12 @@
   "addr": "北海道小樽市稲穂1丁目3番8号",
   "lat": 43.195544,
   "lng": 140.998285,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラロコン",
+    "dex": 37
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/5a324c4217960388cb12d0c412bb2ae5_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/5a324c4217960388cb12d0c412bb2ae5_s.png"
  },
@@ -4002,7 +4034,16 @@
   "addr": "北海道えりも町本町53-1",
   "lat": 42.01782,
   "lng": 143.14619,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラロコン",
+    "dex": 37
+   },
+   {
+    "name": "ルガルガン",
+    "dex": 745
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/d6112e741a398a77436b6a4eca00b2cf_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/d6112e741a398a77436b6a4eca00b2cf_s.png"
  },
@@ -4013,7 +4054,12 @@
   "addr": "千葉県香取市佐原イ109-14",
   "lat": 35.894417,
   "lng": 140.493902,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "ガラルカモネギ",
+    "dex": 83
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/c9284e72a57917ac1347408c2c48b8a7_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/c9284e72a57917ac1347408c2c48b8a7_s.png"
  },
@@ -4660,7 +4706,12 @@
   "addr": "佐賀県佐賀市水ヶ江2丁目11-11",
   "lat": 33.24833583,
   "lng": 130.3089011,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラニャース",
+    "dex": 52
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/aa70252404971db18df4f2bc527a951c_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/aa70252404971db18df4f2bc527a951c_s.png"
  },
@@ -4671,7 +4722,12 @@
   "addr": "佐賀県佐賀市城内1丁目1-59",
   "lat": 33.24900974,
   "lng": 130.3003128,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "ガラルニャース",
+    "dex": 52
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/64eddebc32fe29d163ab826aea4181c1_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/64eddebc32fe29d163ab826aea4181c1_s.png"
  },
@@ -6038,7 +6094,16 @@
   "addr": "北海道美瑛町本町1丁目9番21号",
   "lat": 43.59198,
   "lng": 142.46372,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "アローラロコン",
+    "dex": 37
+   },
+   {
+    "name": "ヒスイウォーグル",
+    "dex": 628
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/de1fad5b97b1302c551d9589cad60c01_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/de1fad5b97b1302c551d9589cad60c01_s.png"
  },
@@ -6433,7 +6498,12 @@
   "addr": "和歌山県高野町高野山357",
   "lat": 34.212091,
   "lng": 135.583052,
-  "pokemon": [],
+  "pokemon": [
+   {
+    "name": "ウーラオス",
+    "dex": 892
+   }
+  ],
   "img": "https://local.pokemon.jp/img/p/manhole/1361a905da2d83b5309cd04822de4f32_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/1361a905da2d83b5309cd04822de4f32_s.png"
  },

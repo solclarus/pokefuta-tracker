@@ -59,7 +59,9 @@ def parse(i: int, h: str):
     addr_m = re.search(r'<div class="block map">.*?<p>([^<]*)</p>', body, re.S)
     address = html.unescape(addr_m.group(1).strip()) if addr_m else ""
     pokes = re.findall(
-        r'zukan\.pokemon\.co\.jp/detail/(\d+)"[^>]*>\s*<span>([^<]+)</span>', body
+        # リージョンフォーム等は "037-1" のようにフォーム番号付き。dex は基本番号のみ使う。
+        r'zukan\.pokemon\.co\.jp/detail/(\d+)(?:-\d+)?"[^>]*>\s*<span>([^<]+)</span>',
+        body,
     )
     img_m = re.search(r'<img src="([^"]+_l\.png)"', body)
     img = (BASE + img_m.group(1)) if img_m else ""

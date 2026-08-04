@@ -8,6 +8,8 @@ import { ListView } from "./components/ListView";
 import { Fabs } from "./components/Fabs";
 import { DetailSheet } from "./components/DetailSheet";
 import { StatsPanel } from "./components/StatsPanel";
+import { FilterPanel } from "./components/FilterPanel";
+import { cityKey } from "./utils";
 
 const searchText = (r: Item) =>
   (r.pref + r.city + r.addr + (r.name ?? "") + (r.pokemon?.map((p) => p.name).join("") ?? "")).toLowerCase();
@@ -17,6 +19,8 @@ export default function App() {
   const category = useStore((s) => s.category);
   const filter = useStore((s) => s.filter);
   const query = useStore((s) => s.query);
+  const selectedPrefs = useStore((s) => s.selectedPrefs);
+  const selectedCities = useStore((s) => s.selectedCities);
   const collected = useStore((s) => s.collected[s.category]);
   const view = useStore((s) => s.view);
 
@@ -33,10 +37,12 @@ export default function App() {
       const done = !!collected[r.no];
       if (filter === "done" && !done) return false;
       if (filter === "todo" && done) return false;
+      if (selectedPrefs.length && !selectedPrefs.includes(r.pref)) return false;
+      if (selectedCities.length && !selectedCities.includes(cityKey(r.pref, r.city))) return false;
       if (q && !searchText(r).includes(q)) return false;
       return true;
     });
-  }, [data, filter, query, collected]);
+  }, [data, filter, query, selectedPrefs, selectedCities, collected]);
 
   const selectedRec = useStore((s) =>
     s.selected == null ? null : ITEMS[s.category].find((r) => r.no === s.selected) ?? null
@@ -52,6 +58,7 @@ export default function App() {
       </div>
       <DetailSheet rec={selectedRec} />
       <StatsPanel data={data} />
+      <FilterPanel data={data} />
     </div>
   );
 }

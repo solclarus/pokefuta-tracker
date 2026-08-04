@@ -26,7 +26,7 @@ export function StatsPanel({ data }: { data: Item[] }) {
   const open = useStore((s) => s.statsOpen);
   const setOpen = useStore((s) => s.setStatsOpen);
   const collected = useStore((s) => s.collected[s.category]);
-  const setQuery = useStore((s) => s.setQuery);
+  const setSelectedPrefs = useStore((s) => s.setSelectedPrefs);
   const setFilter = useStore((s) => s.setFilter);
   const [expanded, setExpanded] = useState<Region | null>(null);
 
@@ -54,7 +54,7 @@ export function StatsPanel({ data }: { data: Item[] }) {
   }, [data, collected]);
 
   const jumpTo = (pref: string) => {
-    setQuery(pref);
+    setSelectedPrefs([pref]);
     setFilter("all");
     setOpen(false);
   };

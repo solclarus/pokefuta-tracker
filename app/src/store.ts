@@ -10,6 +10,9 @@ interface State {
   theme: Theme;
   filter: FilterMode;
   query: string;
+  selectedPrefs: string[];
+  selectedCities: string[];
+  filterOpen: boolean;
   selected: number | null;
   statsOpen: boolean;
   view: ViewMode;
@@ -20,6 +23,11 @@ interface State {
   toggleTheme: () => void;
   setFilter: (f: FilterMode) => void;
   setQuery: (q: string) => void;
+  togglePref: (pref: string) => void;
+  toggleCity: (cityKey: string) => void;
+  setSelectedPrefs: (prefs: string[]) => void;
+  clearAdvancedFilters: () => void;
+  setFilterOpen: (v: boolean) => void;
   select: (no: number | null) => void;
   setStatsOpen: (v: boolean) => void;
   setView: (v: ViewMode) => void;
@@ -38,11 +46,15 @@ export const useStore = create<State>()(
       theme: systemTheme(),
       filter: "all",
       query: "",
+      selectedPrefs: [],
+      selectedCities: [],
+      filterOpen: false,
       selected: null,
       statsOpen: false,
       view: "map",
       userPos: null,
-      setCategory: (category) => set({ category, selected: null, query: "" }),
+      setCategory: (category) =>
+        set({ category, selected: null, query: "", selectedPrefs: [], selectedCities: [] }),
       toggleCollected: (no) =>
         set((s) => {
           const cur = { ...s.collected[s.category] };
@@ -54,6 +66,21 @@ export const useStore = create<State>()(
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
       setFilter: (filter) => set({ filter }),
       setQuery: (query) => set({ query }),
+      togglePref: (pref) =>
+        set((s) => ({
+          selectedPrefs: s.selectedPrefs.includes(pref)
+            ? s.selectedPrefs.filter((p) => p !== pref)
+            : [...s.selectedPrefs, pref],
+        })),
+      toggleCity: (cityKey) =>
+        set((s) => ({
+          selectedCities: s.selectedCities.includes(cityKey)
+            ? s.selectedCities.filter((c) => c !== cityKey)
+            : [...s.selectedCities, cityKey],
+        })),
+      setSelectedPrefs: (selectedPrefs) => set({ selectedPrefs, selectedCities: [] }),
+      clearAdvancedFilters: () => set({ selectedPrefs: [], selectedCities: [] }),
+      setFilterOpen: (filterOpen) => set({ filterOpen }),
       select: (selected) => set({ selected }),
       setStatsOpen: (statsOpen) => set({ statsOpen }),
       setView: (view) => set({ view }),

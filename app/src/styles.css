@@ -382,7 +382,12 @@ body {
   flex-direction: column;
   gap: 10px;
 }
+.fabs.fabs-right {
+  left: auto;
+  right: 16px;
+}
 .fab {
+  position: relative;
   width: 46px;
   height: 46px;
   border-radius: 15px;
@@ -395,6 +400,23 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
   transition: 0.15s;
+}
+.fab-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg);
 }
 .fab:hover {
   border-color: var(--accent);
@@ -930,6 +952,72 @@ body {
 }
 .stat-bar span.full {
   background: linear-gradient(90deg, var(--done), #86efac);
+}
+
+/* ---------- filter panel ---------- */
+.stats-head .fp-clear {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.14s;
+  white-space: nowrap;
+}
+.stats-head .fp-clear:hover {
+  color: var(--text);
+  border-color: var(--brand);
+}
+.fp-badge {
+  background: var(--brand);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fp-check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.fp-check-row:hover {
+  background: var(--panel2);
+}
+.fp-check-row input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.fp-check-row .pname {
+  width: auto;
+  flex: 1;
+  color: var(--text);
+  font-size: 13.5px;
+}
+.fp-check-row .pcount {
+  width: auto;
+}
+.fp-cities {
+  padding: 0 0 6px 26px;
+}
+.fp-city .pname {
+  color: var(--sub);
+  font-size: 12.5px;
 }
 
 /* ---------- desktop ---------- */

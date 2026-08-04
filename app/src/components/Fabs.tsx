@@ -44,6 +44,11 @@ const IconClose = () => (
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
 );
+const IconFilter = () => (
+  <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 6h16M7 12h10M10 18h4" />
+  </svg>
+);
 
 const FILTER_ORDER: FilterMode[] = ["all", "todo", "done"];
 const FILTER_CHAR: Record<FilterMode, string> = { all: "全", todo: "未", done: "済" };
@@ -59,6 +64,9 @@ export function Fabs() {
   const theme = useStore((s) => s.theme);
   const toggleTheme = useStore((s) => s.toggleTheme);
   const category = useStore((s) => s.category);
+  const setFilterOpen = useStore((s) => s.setFilterOpen);
+  const advancedFilterCount =
+    useStore((s) => s.selectedPrefs.length) + useStore((s) => s.selectedCities.length);
 
   const [locating, setLocating] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -108,18 +116,10 @@ export function Fabs() {
           {theme === "dark" ? <IconSun /> : <IconMoon />}
         </button>
         <button
-          className={`fab ${query ? "active" : ""}`}
-          onClick={() => setSearchOpen((o) => !o)}
-          title="検索"
-          aria-label="検索"
-        >
-          <IconSearch />
-        </button>
-        <button
           className={`fab ${filter !== "all" ? "active" : ""}`}
           onClick={cycleFilter}
-          title={`フィルタ: ${FILTER_CHAR[filter]}`}
-          aria-label="フィルタ切替"
+          title={`達成状況: ${FILTER_CHAR[filter]}`}
+          aria-label="達成状況フィルタ切替"
         >
           <span className="fab-char">{FILTER_CHAR[filter]}</span>
         </button>
@@ -141,6 +141,26 @@ export function Fabs() {
             <IconLocate />
           </button>
         )}
+      </div>
+
+      <div className="fabs fabs-right">
+        <button
+          className={`fab ${query ? "active" : ""}`}
+          onClick={() => setSearchOpen((o) => !o)}
+          title="検索"
+          aria-label="検索"
+        >
+          <IconSearch />
+        </button>
+        <button
+          className={`fab ${advancedFilterCount > 0 ? "active" : ""}`}
+          onClick={() => setFilterOpen(true)}
+          title="フィルタ（都道府県・市区町村）"
+          aria-label="フィルタを開く"
+        >
+          <IconFilter />
+          {advancedFilterCount > 0 && <span className="fab-badge">{advancedFilterCount}</span>}
+        </button>
       </div>
     </>
   );

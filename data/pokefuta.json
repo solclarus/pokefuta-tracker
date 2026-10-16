@@ -9834,5 +9834,89 @@
   ],
   "img": "https://local.pokemon.jp/img/p/manhole/7fe9b42164a7f9fbaeb73ef90a2790ea_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/7fe9b42164a7f9fbaeb73ef90a2790ea_s.png"
+ },
+ {
+  "no": 487,
+  "pref": "沖縄県",
+  "city": "国頭村",
+  "addr": "沖縄県国頭村字辺戸岬原973番1の一部",
+  "lat": 26.872162,
+  "lng": 128.264672,
+  "pokemon": [
+   {
+    "name": "ガーディ",
+    "dex": 58
+   },
+   {
+    "name": "ルナアーラ",
+    "dex": 792
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/f79121a17f5f589b40e2feedb2848d3b_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/f79121a17f5f589b40e2feedb2848d3b_s.png"
+ },
+ {
+  "no": 488,
+  "pref": "沖縄県",
+  "city": "大宜味村",
+  "addr": "沖縄県大宜味村津波95番地",
+  "lat": 26.661031,
+  "lng": 128.101938,
+  "pokemon": [
+   {
+    "name": "ガーディ",
+    "dex": 58
+   },
+   {
+    "name": "ヤヤコマ",
+    "dex": 661
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/f745f645cf152dfe2988aa4105859155_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/f745f645cf152dfe2988aa4105859155_s.png"
+ },
+ {
+  "no": 489,
+  "pref": "沖縄県",
+  "city": "東村",
+  "addr": "沖縄県東村平良550-23",
+  "lat": 26.631012,
+  "lng": 128.153484,
+  "pokemon": [
+   {
+    "name": "ガーディ",
+    "dex": 58
+   },
+   {
+    "name": "ニョロトノ",
+    "dex": 186
+   },
+   {
+    "name": "グレッグル",
+    "dex": 453
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/b6f977b3a49bcc88bf754f3729612c3d_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/b6f977b3a49bcc88bf754f3729612c3d_s.png"
+ },
+ {
+  "no": 490,
+  "pref": "沖縄県",
+  "city": "北大東村",
+  "addr": "沖縄県北大東村南",
+  "lat": 25.944616,
+  "lng": 131.327837,
+  "pokemon": [
+   {
+    "name": "ガーディ",
+    "dex": 58
+   },
+   {
+    "name": "ソルガレオ",
+    "dex": 791
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/692b4dc5772e4a42da8117ac26f2fdda_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/692b4dc5772e4a42da8117ac26f2fdda_s.png"
  }
 ]

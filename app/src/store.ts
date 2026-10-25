@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Category, FilterMode, Theme, ViewMode } from "./types";
-
-type CollectedMap = Record<number, true>;
+import type { CollectedAll, CollectedMap } from "./backup";
+import { migrateState } from "./migrate";
 
 interface State {
   category: Category;
@@ -17,8 +17,14 @@ interface State {
   statsOpen: boolean;
   view: ViewMode;
   userPos: [number, number] | null;
+  /** 現在地を追従中か */
+  tracking: boolean;
+  /** 画面下に一時表示するメッセージ（id は同じ文言の連続表示用） */
+  toast: { id: number; msg: string } | null;
   setCategory: (c: Category) => void;
   toggleCollected: (no: number) => void;
+  /** バックアップの取得済みを今のデータに追加する（既存のチェックは消さない） */
+  mergeCollected: (incoming: CollectedAll) => void;
   setTheme: (t: Theme) => void;
   toggleTheme: () => void;
   setFilter: (f: FilterMode) => void;
@@ -33,6 +39,9 @@ interface State {
   setView: (v: ViewMode) => void;
   toggleView: () => void;
   setUserPos: (p: [number, number] | null) => void;
+  setTracking: (v: boolean) => void;
+  showToast: (msg: string) => void;
+  hideToast: () => void;
 }
 
 const systemTheme = (): Theme =>
@@ -53,6 +62,8 @@ export const useStore = create<State>()(
       statsOpen: false,
       view: "map",
       userPos: null,
+      tracking: false,
+      toast: null,
       setCategory: (category) =>
         set({ category, selected: null, query: "", selectedPrefs: [], selectedCities: [] }),
       toggleCollected: (no) =>
@@ -62,6 +73,13 @@ export const useStore = create<State>()(
           else cur[no] = true;
           return { collected: { ...s.collected, [s.category]: cur } };
         }),
+      mergeCollected: (incoming) =>
+        set((s) => ({
+          collected: {
+            pokefuta: { ...s.collected.pokefuta, ...incoming.pokefuta },
+            pokecen: { ...s.collected.pokecen, ...incoming.pokecen },
+          },
+        })),
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
       setFilter: (filter) => set({ filter }),
@@ -86,6 +104,9 @@ export const useStore = create<State>()(
       setView: (view) => set({ view }),
       toggleView: () => set({ view: get().view === "map" ? "list" : "map" }),
       setUserPos: (userPos) => set({ userPos }),
+      showToast: (msg) => set({ toast: { id: Date.now(), msg } }),
+      hideToast: () => set({ toast: null }),
+      setTracking: (tracking) => set(tracking ? { tracking } : { tracking, userPos: null }),
     }),
     {
       name: "pokefuta_v1",
@@ -95,18 +116,7 @@ export const useStore = create<State>()(
         theme: s.theme,
         category: s.category,
       }),
-      migrate: (persisted, version) => {
-        const p = persisted as { collected?: Record<string, unknown> } | undefined;
-        if (p && version < 2) {
-          const old = p.collected ?? {};
-          const isFlat = !("pokefuta" in old) && !("pokecen" in old);
-          p.collected = {
-            pokefuta: (isFlat ? old : (old as Record<string, CollectedMap>).pokefuta) ?? {},
-            pokecen: (old as Record<string, CollectedMap>).pokecen ?? {},
-          };
-        }
-        return p as unknown;
-      },
+      migrate: migrateState,
     }
   )
 );

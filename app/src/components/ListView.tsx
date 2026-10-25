@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import type { Item } from "../types";
 import { useStore } from "../store";
+import { distanceKm, formatKm } from "../utils";
 
 const IconCheck = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
@@ -20,12 +22,22 @@ export function ListView({ data }: { data: Item[] }) {
   const collected = useStore((s) => s.collected[s.category]);
   const toggleCollected = useStore((s) => s.toggleCollected);
   const select = useStore((s) => s.select);
+  const userPos = useStore((s) => s.userPos);
+
+  // 現在地があれば近い順に並べる
+  const rows = useMemo(() => {
+    if (!userPos) return data.map((r) => ({ r, km: null as number | null }));
+    return data
+      .map((r) => ({ r, km: distanceKm(userPos, [r.lat, r.lng]) as number | null }))
+      .sort((a, b) => a.km! - b.km!);
+  }, [data, userPos]);
 
   return (
     <div className="list-wrap">
       {data.length === 0 && <div className="list-empty">該当するものがありません</div>}
+      {userPos && data.length > 0 && <div className="list-sortnote">現在地から近い順</div>}
       <ul className="list">
-        {data.map((r) => {
+        {rows.map(({ r, km }) => {
           const done = !!collected[r.no];
           const place = r.name ?? `${r.pref}/${r.city}`;
           const sub = r.pokemon?.map((p) => p.name).join("・") ?? `${r.pref}${r.city}`;
@@ -40,7 +52,10 @@ export function ListView({ data }: { data: Item[] }) {
                   </span>
                 )}
                 <span className="list-text">
-                  <span className="list-place">{place}</span>
+                  <span className="list-place">
+                    {place}
+                    {km != null && <span className="list-dist">{formatKm(km)}</span>}
+                  </span>
                   <span className="list-poke">{sub}</span>
                 </span>
               </button>

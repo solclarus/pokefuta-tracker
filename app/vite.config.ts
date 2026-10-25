@@ -1,11 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { TILE } from "./src/tiles";
 
 export default defineConfig({
-  // GitHub Pages のプロジェクトサイト（/<repo>/）用。CI で BASE_PATH を渡す。
-  // ローカル（dev/preview）は "/" で動作。
-  base: process.env.BASE_PATH || "/",
   // dev サーバがリポジトリ直下の data/ を import できるようにする
   server: { fs: { allow: [".."] } },
   plugins: [
@@ -38,11 +36,11 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
-            // 地図タイル（CARTO）
-            urlPattern: /^https:\/\/[a-d]\.basemaps\.cartocdn\.com\/.*/i,
+            // 地図タイル（提供元は src/tiles.ts）
+            urlPattern: TILE.cachePattern,
             handler: "CacheFirst",
             options: {
-              cacheName: "map-tiles",
+              cacheName: "map-tiles-osm",
               expiration: { maxEntries: 3000, maxAgeSeconds: 60 * 60 * 24 * 30 },
               cacheableResponse: { statuses: [0, 200] },
             },

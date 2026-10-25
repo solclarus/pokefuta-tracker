@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { Item } from "../types";
 import { useStore } from "../store";
 import { REGION_ORDER, regionOf, type Region } from "../regions";
+import { downloadBackup, parseBackup } from "../backup";
 
 interface Cnt {
   total: number;
@@ -29,6 +30,20 @@ export function StatsPanel({ data }: { data: Item[] }) {
   const setSelectedPrefs = useStore((s) => s.setSelectedPrefs);
   const setFilter = useStore((s) => s.setFilter);
   const [expanded, setExpanded] = useState<Region | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const exportBackup = () => downloadBackup(useStore.getState().collected);
+
+  const importBackup = async (file: File) => {
+    try {
+      const incoming = parseBackup(await file.text());
+      const n = Object.keys(incoming.pokefuta).length + Object.keys(incoming.pokecen).length;
+      useStore.getState().mergeCollected(incoming);
+      useStore.getState().showToast(`バックアップから ${n} 件の取得済みを読み込みました`);
+    } catch (e) {
+      useStore.getState().showToast(e instanceof Error ? e.message : "読み込みに失敗しました。");
+    }
+  };
 
   const { byRegion, byPref, total } = useMemo(() => {
     const byRegion = new Map<Region, Cnt>();
@@ -105,6 +120,28 @@ export function StatsPanel({ data }: { data: Item[] }) {
               </div>
             );
           })}
+          <div className="backup">
+            <div className="backup-note">取得済みのチェックはこの端末にだけ保存されています。機種変更に備えてバックアップしておけます。</div>
+            <div className="backup-btns">
+              <button className="backup-btn" onClick={exportBackup}>
+                バックアップを書き出す
+              </button>
+              <button className="backup-btn" onClick={() => fileRef.current?.click()}>
+                バックアップから読み込む
+              </button>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) importBackup(f);
+                e.target.value = "";
+              }}
+            />
+          </div>
         </div>
       </aside>
     </>

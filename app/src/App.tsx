@@ -9,6 +9,8 @@ import { Fabs } from "./components/Fabs";
 import { DetailSheet } from "./components/DetailSheet";
 import { StatsPanel } from "./components/StatsPanel";
 import { FilterPanel } from "./components/FilterPanel";
+import { GeoWatcher } from "./components/GeoWatcher";
+import { Toast } from "./components/Toast";
 import { cityKey } from "./utils";
 
 const searchText = (r: Item) =>
@@ -59,6 +61,8 @@ export default function App() {
       <DetailSheet rec={selectedRec} />
       <StatsPanel data={data} />
       <FilterPanel data={data} />
+      <GeoWatcher />
+      <Toast />
     </div>
   );
 }

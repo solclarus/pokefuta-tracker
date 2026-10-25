@@ -56,7 +56,9 @@ const FILTER_CHAR: Record<FilterMode, string> = { all: "全", todo: "未", done:
 export function Fabs() {
   const view = useStore((s) => s.view);
   const toggleView = useStore((s) => s.toggleView);
-  const setUserPos = useStore((s) => s.setUserPos);
+  const tracking = useStore((s) => s.tracking);
+  const setTracking = useStore((s) => s.setTracking);
+  const locating = useStore((s) => s.tracking && !s.userPos);
   const filter = useStore((s) => s.filter);
   const setFilter = useStore((s) => s.setFilter);
   const query = useStore((s) => s.query);
@@ -68,30 +70,13 @@ export function Fabs() {
   const advancedFilterCount =
     useStore((s) => s.selectedPrefs.length) + useStore((s) => s.selectedCities.length);
 
-  const [locating, setLocating] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const cycleFilter = () =>
     setFilter(FILTER_ORDER[(FILTER_ORDER.indexOf(filter) + 1) % FILTER_ORDER.length]);
 
-  const locate = () => {
-    if (!navigator.geolocation) {
-      alert("この端末では現在地を取得できません。");
-      return;
-    }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserPos([pos.coords.latitude, pos.coords.longitude]);
-        setLocating(false);
-      },
-      () => {
-        setLocating(false);
-        alert("現在地を取得できませんでした。位置情報の許可を確認してください。");
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
-    );
-  };
+  // 押すたびに現在地の追従を開始／停止する
+  const locate = () => setTracking(!tracking);
 
   return (
     <>
@@ -131,16 +116,15 @@ export function Fabs() {
         >
           {view === "map" ? <IconList /> : <IconMap />}
         </button>
-        {view === "map" && (
-          <button
-            className={`fab ${locating ? "loading" : ""}`}
-            onClick={locate}
-            title="現在地"
-            aria-label="現在地を表示"
-          >
-            <IconLocate />
-          </button>
-        )}
+        <button
+          className={`fab ${locating ? "loading" : tracking ? "active" : ""}`}
+          onClick={locate}
+          title={tracking ? "現在地の追従を止める" : "現在地（近い順）"}
+          aria-label={tracking ? "現在地の追従を止める" : "現在地を表示"}
+          aria-pressed={tracking}
+        >
+          <IconLocate />
+        </button>
       </div>
 
       <div className="fabs fabs-right">

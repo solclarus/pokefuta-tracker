@@ -4,11 +4,8 @@ import L from "leaflet";
 import "leaflet.markercluster";
 import type { Category, Item } from "../types";
 import { useStore } from "../store";
+import { TILE } from "../tiles";
 
-const TILES = {
-  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  light: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-};
 
 // ポケセン用のポケボール型ピン（画像を持たないアイテム向け）
 const BALL = `<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="#fff"/><path d="M2 22a20 20 0 0 1 40 0z" fill="#ff5470"/><rect x="2" y="19.5" width="40" height="5" fill="#1c212d"/><circle cx="22" cy="22" r="6" fill="#fff" stroke="#1c212d" stroke-width="3"/></svg>`;
@@ -25,11 +22,23 @@ function pinIcon(rec: Item, done: boolean) {
   });
 }
 
+type PinMarker = L.Marker & { no: number };
+
 function ClusterLayer({ data }: { data: Item[] }) {
   const map = useMap();
   const collected = useStore((s) => s.collected[s.category]);
   const select = useStore((s) => s.select);
+  // マーカー生成時の初期状態は最新の取得状況を ref 経由で参照する
+  const collectedRef = useRef(collected);
+  useEffect(() => {
+    collectedRef.current = collected;
+  }, [collected]);
+  const groupRef = useRef<L.MarkerClusterGroup | null>(null);
+  const markersRef = useRef<PinMarker[]>([]);
+  // 各ピンに今描画している取得状態（クラスタの達成率もここから数える）
+  const doneRef = useRef(new Map<number, boolean>());
 
+  // data が変わったときだけマーカーを作り直す
   useEffect(() => {
     const group = L.markerClusterGroup({
       maxClusterRadius: 50,
@@ -37,9 +46,9 @@ function ClusterLayer({ data }: { data: Item[] }) {
       spiderfyOnMaxZoom: true,
       chunkedLoading: true,
       iconCreateFunction(cluster) {
-        const kids = cluster.getAllChildMarkers() as (L.Marker & { no: number })[];
+        const kids = cluster.getAllChildMarkers() as PinMarker[];
         const n = kids.length;
-        const doneN = kids.filter((m) => !!collected[m.no]).length;
+        const doneN = kids.filter((m) => doneRef.current.get(m.no)).length;
         const pct = Math.round((doneN / n) * 100);
         const size = n < 10 ? 40 : n < 50 ? 48 : 56;
         return L.divIcon({
@@ -50,21 +59,43 @@ function ClusterLayer({ data }: { data: Item[] }) {
       },
     });
 
+    const doneMap = doneRef.current;
+    doneMap.clear();
     const markers = data.map((rec) => {
-      const m = L.marker([rec.lat, rec.lng], {
-        icon: pinIcon(rec, !!collected[rec.no]),
-      }) as L.Marker & { no: number };
+      const done = !!collectedRef.current[rec.no];
+      const m = L.marker([rec.lat, rec.lng], { icon: pinIcon(rec, done) }) as PinMarker;
       m.no = rec.no;
+      doneMap.set(rec.no, done);
       m.on("click", () => select(rec.no));
       return m;
     });
     group.addLayers(markers);
     map.addLayer(group);
+    groupRef.current = group;
+    markersRef.current = markers;
 
     return () => {
       map.removeLayer(group);
+      groupRef.current = null;
+      markersRef.current = [];
     };
-  }, [map, data, collected, select]);
+  }, [map, data, select]);
+
+  // 取得状況の変化は、変わったピンのアイコンと親クラスタだけ更新する
+  useEffect(() => {
+    const changed: PinMarker[] = [];
+    const doneMap = doneRef.current;
+    const byNo = new Map(data.map((r) => [r.no, r]));
+    for (const m of markersRef.current) {
+      const done = !!collected[m.no];
+      if (doneMap.get(m.no) === done) continue;
+      doneMap.set(m.no, done);
+      const rec = byNo.get(m.no);
+      if (rec) m.setIcon(pinIcon(rec, done));
+      changed.push(m);
+    }
+    if (changed.length) groupRef.current?.refreshClusters(changed);
+  }, [collected, data]);
 
   return null;
 }
@@ -124,13 +155,18 @@ function UserMarker() {
   const markerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
-    if (!userPos) return;
+    if (!userPos) {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      return;
+    }
     if (!markerRef.current) {
+      // 追従開始後の最初の位置でだけ地図を寄せる（以降はマーカーのみ動かす）
       markerRef.current = L.marker(userPos, { icon: userIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
+      map.flyTo(userPos, Math.max(map.getZoom(), 13), { duration: 0.8 });
     } else {
       markerRef.current.setLatLng(userPos);
     }
-    map.flyTo(userPos, Math.max(map.getZoom(), 13), { duration: 0.8 });
   }, [map, userPos]);
 
   useEffect(() => () => {
@@ -141,7 +177,6 @@ function UserMarker() {
 }
 
 export function MapView({ data, category }: { data: Item[]; category: Category }) {
-  const theme = useStore((s) => s.theme);
   return (
     <div className="map-wrap">
       <MapContainer
@@ -154,11 +189,10 @@ export function MapView({ data, category }: { data: Item[]; category: Category }
         worldCopyJump
       >
         <TileLayer
-          key={theme}
-          url={TILES[theme]}
-          subdomains="abcd"
-          attribution='&copy; OpenStreetMap &copy; CARTO'
-          maxZoom={20}
+          url={TILE.url}
+          attribution={TILE.attribution}
+          maxNativeZoom={TILE.maxNativeZoom}
+          maxZoom={19}
         />
         <ClusterLayer data={data} />
         <FlyTo data={data} />

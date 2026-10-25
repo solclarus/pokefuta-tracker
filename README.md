@@ -18,7 +18,10 @@ pokefuta-tracker/
 cd app
 npm install
 npm run dev      # http://localhost:5173
-npm run build    # 本番ビルド
+npm run build    # 本番ビルド（tsc + Vite 8 / Rolldown）
+npm run preview  # ビルドして wrangler dev（Cloudflare と同じ配信で確認）
+npm run lint     # oxlint
+npm test         # Vitest
 ```
 
 ## データ更新
@@ -33,7 +36,15 @@ python3 scripts/fetch_pokefuta.py
 
 ## デプロイ / 利用
 
-`main` への push で GitHub Pages へ自動デプロイ（`.github/workflows/deploy-pages.yml`）。
+`main` への push で Cloudflare Workers（静的アセット）へ自動デプロイ（`.github/workflows/deploy.yml`）。
+データ自動更新の完了後にも再デプロイされる。設定は `app/wrangler.jsonc`、キャッシュヘッダは `app/public/_headers`。
+
+初回のみ GitHub リポジトリの Secrets に以下を登録する:
+
+- `CLOUDFLARE_API_TOKEN`: 「Edit Cloudflare Workers」テンプレートで作成した API トークン
+- `CLOUDFLARE_ACCOUNT_ID`: Cloudflare ダッシュボードのアカウント ID
+
+手元から直接デプロイする場合は `cd app && npx wrangler login && npm run deploy`。
 スマホは公開 URL を「ホーム画面に追加」で PWA として使える（オフライン対応）。
 取得済みチェックは端末の localStorage に保存される。
 

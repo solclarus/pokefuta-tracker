@@ -36,6 +36,8 @@ python3 scripts/fetch_pokefuta.py
 
 ## デプロイ / 利用
 
+公開URL: https://pokefuta.solclarus.me
+
 `main` への push で Cloudflare Workers（静的アセット）へ自動デプロイ（`.github/workflows/deploy.yml`）。
 データ自動更新の完了後にも再デプロイされる。設定は `app/wrangler.jsonc`、キャッシュヘッダは `app/public/_headers`。
 

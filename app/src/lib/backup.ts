@@ -1,8 +1,4 @@
-import type { Category } from "./types";
-import { CATEGORIES } from "./items";
-
-export type CollectedMap = Record<number, true>;
-export type CollectedAll = Record<Category, CollectedMap>;
+import { CATEGORIES, type Category, type CollectedAll } from "../types";
 
 /** バックアップファイルの形式（取得済みの番号だけを持つ） */
 interface BackupFile {

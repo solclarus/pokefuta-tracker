@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { useStore } from "../store";
-import { CATEGORIES, CATEGORY_LABEL } from "../items";
+import { CATEGORIES, CATEGORY_LABEL } from "../types";
 
 /** 地図の上に浮かぶカテゴリ切替＋進捗（ヘッダーの代わり） */
 export function Hud({ total }: { total: number }) {

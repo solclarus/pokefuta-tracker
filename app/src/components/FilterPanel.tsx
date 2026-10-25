@@ -1,8 +1,16 @@
 import { useMemo, useState } from "react";
 import type { Item } from "../types";
 import { useStore } from "../store";
-import { REGION_ORDER, regionOf, type Region } from "../regions";
-import { cityKey } from "../utils";
+import { byJa, groupByRegion, type Region } from "../lib/regions";
+import { cityKey } from "../lib/filter";
+import { Panel, RegionRow } from "./Panel";
+
+/** 市区町村名 → 件数（五十音順） */
+function cityCounts(items: Item[]) {
+  const m = new Map<string, number>();
+  for (const r of items) m.set(r.city, (m.get(r.city) ?? 0) + 1);
+  return [...m.entries()].sort((a, b) => byJa(a[0], b[0]));
+}
 
 export function FilterPanel({ data }: { data: Item[] }) {
   const open = useStore((s) => s.filterOpen);
@@ -14,107 +22,69 @@ export function FilterPanel({ data }: { data: Item[] }) {
   const clearAdvancedFilters = useStore((s) => s.clearAdvancedFilters);
   const [expanded, setExpanded] = useState<Region | null>(null);
 
-  const byRegion = useMemo(() => {
-    const m = new Map<Region, Map<string, Map<string, number>>>(); // region -> pref -> city -> count
-    for (const r of data) {
-      const reg = regionOf(r.pref);
-      const prefs = m.get(reg) ?? new Map<string, Map<string, number>>();
-      const cities = prefs.get(r.pref) ?? new Map<string, number>();
-      cities.set(r.city, (cities.get(r.city) ?? 0) + 1);
-      prefs.set(r.pref, cities);
-      m.set(reg, prefs);
-    }
-    return m;
-  }, [data]);
-
+  const groups = useMemo(() => groupByRegion(data), [data]);
   const activeCount = selectedPrefs.length + selectedCities.length;
 
-  const onTogglePref = (pref: string, cities: Map<string, number>) => {
-    const wasChecked = selectedPrefs.includes(pref);
-    togglePref(pref);
-    if (wasChecked) {
-      for (const city of cities.keys()) {
-        const key = cityKey(pref, city);
-        if (selectedCities.includes(key)) toggleCity(key);
-      }
-    }
-  };
-
   return (
-    <>
-      <div className={`scrim ${open ? "show" : ""}`} onClick={() => setOpen(false)} />
-      <aside className={`stats filterpanel ${open ? "open" : ""}`} aria-hidden={!open}>
-        <div className="stats-head">
-          <h2>フィルタ</h2>
-          {activeCount > 0 && (
-            <button className="fp-clear" onClick={clearAdvancedFilters}>
-              クリア（{activeCount}）
-            </button>
-          )}
-          <button className="sheet-close" onClick={() => setOpen(false)} aria-label="閉じる">
-            ✕
+    <Panel
+      open={open}
+      onClose={() => setOpen(false)}
+      title="フィルタ"
+      className="filterpanel"
+      headExtra={
+        activeCount > 0 && (
+          <button className="fp-clear" onClick={clearAdvancedFilters}>
+            クリア（{activeCount}）
           </button>
-        </div>
-        <div className="stats-body">
-          {REGION_ORDER.map((reg) => {
-            const prefs = byRegion.get(reg);
-            if (!prefs) return null;
-            const isOpen = expanded === reg;
-            const sortedPrefs = [...prefs.keys()].sort((a, b) => a.localeCompare(b, "ja"));
-            const regionSelectedCount = sortedPrefs.filter((p) => selectedPrefs.includes(p)).length;
-            return (
-              <div key={reg} className={`region ${isOpen ? "open" : ""}`}>
-                <button className="region-row" onClick={() => setExpanded(isOpen ? null : reg)}>
-                  <span className="caret">{isOpen ? "▾" : "▸"}</span>
-                  <span className="rname">{reg}</span>
-                  {regionSelectedCount > 0 && <span className="fp-badge">{regionSelectedCount}</span>}
-                </button>
-                {isOpen && (
-                  <div className="prefs">
-                    {sortedPrefs.map((pref) => {
-                      const cities = prefs.get(pref)!;
-                      const checked = selectedPrefs.includes(pref);
-                      const sortedCities = [...cities.keys()].sort((a, b) => a.localeCompare(b, "ja"));
-                      const prefTotal = sortedCities.reduce((sum, c) => sum + (cities.get(c) ?? 0), 0);
-                      return (
-                        <div key={pref} className="fp-pref-group">
-                          <label className="fp-check-row">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => onTogglePref(pref, cities)}
-                            />
-                            <span className="pname">{pref}</span>
-                            <span className="pcount">{prefTotal}</span>
-                          </label>
-                          {checked && sortedCities.length > 1 && (
-                            <div className="fp-cities">
-                              {sortedCities.map((city) => {
-                                const key = cityKey(pref, city);
-                                return (
-                                  <label key={key} className="fp-check-row fp-city">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedCities.includes(key)}
-                                      onChange={() => toggleCity(key)}
-                                    />
-                                    <span className="pname">{city}</span>
-                                    <span className="pcount">{cities.get(city)}</span>
-                                  </label>
-                                );
-                              })}
-                            </div>
-                          )}
+        )
+      }
+    >
+      {groups.map(({ region, prefs }) => {
+        const isOpen = expanded === region;
+        const selectedInRegion = prefs.filter((p) => selectedPrefs.includes(p.pref)).length;
+        return (
+          <div key={region} className={`region ${isOpen ? "open" : ""}`}>
+            <RegionRow name={region} open={isOpen} onToggle={() => setExpanded(isOpen ? null : region)}>
+              {selectedInRegion > 0 && <span className="fp-badge">{selectedInRegion}</span>}
+            </RegionRow>
+            {isOpen && (
+              <div className="prefs">
+                {prefs.map(({ pref, items }) => {
+                  const checked = selectedPrefs.includes(pref);
+                  const cities = cityCounts(items);
+                  return (
+                    <div key={pref} className="fp-pref-group">
+                      <label className="fp-check-row">
+                        <input type="checkbox" checked={checked} onChange={() => togglePref(pref)} />
+                        <span className="pname">{pref}</span>
+                        <span className="pcount">{items.length}</span>
+                      </label>
+                      {checked && cities.length > 1 && (
+                        <div className="fp-cities">
+                          {cities.map(([city, n]) => {
+                            const key = cityKey(pref, city);
+                            return (
+                              <label key={key} className="fp-check-row fp-city">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedCities.includes(key)}
+                                  onChange={() => toggleCity(key)}
+                                />
+                                <span className="pname">{city}</span>
+                                <span className="pcount">{n}</span>
+                              </label>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-      </aside>
-    </>
+            )}
+          </div>
+        );
+      })}
+    </Panel>
   );
 }

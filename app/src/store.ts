@@ -1,55 +1,71 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Category, FilterMode, Theme, ViewMode } from "./types";
-import type { CollectedAll, CollectedMap } from "./backup";
-import { migrateState } from "./migrate";
+import type { Category, CollectedAll, FilterMode, Theme, ViewMode } from "./types";
+import type { LatLng } from "./lib/geo";
+import { cityKey } from "./lib/filter";
+import { migrateState } from "./lib/migrate";
 
 interface State {
+  // 端末に保存する状態
   category: Category;
-  collected: Record<Category, CollectedMap>;
+  collected: CollectedAll;
   theme: Theme;
+
+  // 絞り込み
   filter: FilterMode;
   query: string;
   selectedPrefs: string[];
+  /** cityKey(pref, city) の配列 */
   selectedCities: string[];
-  filterOpen: boolean;
+
+  // 画面
+  view: ViewMode;
   selected: number | null;
   statsOpen: boolean;
-  view: ViewMode;
-  userPos: [number, number] | null;
-  /** 現在地を追従中か */
-  tracking: boolean;
+  filterOpen: boolean;
   /** 画面下に一時表示するメッセージ（id は同じ文言の連続表示用） */
   toast: { id: number; msg: string } | null;
+
+  // 現在地
+  /** 現在地を追従中か */
+  tracking: boolean;
+  userPos: LatLng | null;
+
   setCategory: (c: Category) => void;
   toggleCollected: (no: number) => void;
   /** バックアップの取得済みを今のデータに追加する（既存のチェックは消さない） */
   mergeCollected: (incoming: CollectedAll) => void;
-  setTheme: (t: Theme) => void;
   toggleTheme: () => void;
+
   setFilter: (f: FilterMode) => void;
   setQuery: (q: string) => void;
+  /** チェックを外すときは、その県の市区町村の選択も外す */
   togglePref: (pref: string) => void;
   toggleCity: (cityKey: string) => void;
+  /** 指定の県だけに絞る（市区町村の選択は解除） */
   setSelectedPrefs: (prefs: string[]) => void;
   clearAdvancedFilters: () => void;
-  setFilterOpen: (v: boolean) => void;
+
+  toggleView: () => void;
   select: (no: number | null) => void;
   setStatsOpen: (v: boolean) => void;
-  setView: (v: ViewMode) => void;
-  toggleView: () => void;
-  setUserPos: (p: [number, number] | null) => void;
-  setTracking: (v: boolean) => void;
+  setFilterOpen: (v: boolean) => void;
   showToast: (msg: string) => void;
   hideToast: () => void;
+
+  /** 追従を止めると現在地も消す */
+  setTracking: (v: boolean) => void;
+  setUserPos: (p: LatLng | null) => void;
 }
 
 const systemTheme = (): Theme =>
   window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
 
+const toggleIn = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+
 export const useStore = create<State>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       category: "pokefuta",
       collected: { pokefuta: {}, pokecen: {} },
       theme: systemTheme(),
@@ -57,13 +73,14 @@ export const useStore = create<State>()(
       query: "",
       selectedPrefs: [],
       selectedCities: [],
-      filterOpen: false,
+      view: "map",
       selected: null,
       statsOpen: false,
-      view: "map",
-      userPos: null,
-      tracking: false,
+      filterOpen: false,
       toast: null,
+      tracking: false,
+      userPos: null,
+
       setCategory: (category) =>
         set({ category, selected: null, query: "", selectedPrefs: [], selectedCities: [] }),
       toggleCollected: (no) =>
@@ -80,33 +97,33 @@ export const useStore = create<State>()(
             pokecen: { ...s.collected.pokecen, ...incoming.pokecen },
           },
         })),
-      setTheme: (theme) => set({ theme }),
-      toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
+      toggleTheme: () => set((s) => ({ theme: s.theme === "dark" ? "light" : "dark" })),
+
       setFilter: (filter) => set({ filter }),
       setQuery: (query) => set({ query }),
       togglePref: (pref) =>
-        set((s) => ({
-          selectedPrefs: s.selectedPrefs.includes(pref)
-            ? s.selectedPrefs.filter((p) => p !== pref)
-            : [...s.selectedPrefs, pref],
-        })),
-      toggleCity: (cityKey) =>
-        set((s) => ({
-          selectedCities: s.selectedCities.includes(cityKey)
-            ? s.selectedCities.filter((c) => c !== cityKey)
-            : [...s.selectedCities, cityKey],
-        })),
+        set((s) => {
+          const removing = s.selectedPrefs.includes(pref);
+          return {
+            selectedPrefs: toggleIn(s.selectedPrefs, pref),
+            selectedCities: removing
+              ? s.selectedCities.filter((c) => !c.startsWith(cityKey(pref, "")))
+              : s.selectedCities,
+          };
+        }),
+      toggleCity: (cityKey) => set((s) => ({ selectedCities: toggleIn(s.selectedCities, cityKey) })),
       setSelectedPrefs: (selectedPrefs) => set({ selectedPrefs, selectedCities: [] }),
       clearAdvancedFilters: () => set({ selectedPrefs: [], selectedCities: [] }),
-      setFilterOpen: (filterOpen) => set({ filterOpen }),
+
+      toggleView: () => set((s) => ({ view: s.view === "map" ? "list" : "map" })),
       select: (selected) => set({ selected }),
       setStatsOpen: (statsOpen) => set({ statsOpen }),
-      setView: (view) => set({ view }),
-      toggleView: () => set({ view: get().view === "map" ? "list" : "map" }),
-      setUserPos: (userPos) => set({ userPos }),
+      setFilterOpen: (filterOpen) => set({ filterOpen }),
       showToast: (msg) => set({ toast: { id: Date.now(), msg } }),
       hideToast: () => set({ toast: null }),
+
       setTracking: (tracking) => set(tracking ? { tracking } : { tracking, userPos: null }),
+      setUserPos: (userPos) => set({ userPos }),
     }),
     {
       name: "pokefuta_v1",

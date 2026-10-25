@@ -3,8 +3,9 @@
 """ポケふた全件データの取得・生成スクリプト。
 
 公式サイト local.pokemon.jp の個別ページ（/manhole/desc/{id}/?is_modal=1）を
-ID 1..MAX_ID まで走査し、実在する全ポケふたを取得する。検索インデックスに
-依存しないため、追加されたばかりの新しいポケふたも確実に拾える。
+ID 1 から「既存データの最大 ID + SCAN_MARGIN」まで走査し、実在する全ポケふたを
+取得する。検索インデックスに依存しないため、追加されたばかりの新しいポケふたも
+確実に拾える。
 
 出力:
   - data/pokefuta.json … 全項目データ（React アプリもここを直接 import する）
@@ -12,17 +13,21 @@ ID 1..MAX_ID まで走査し、実在する全ポケふたを取得する。検�
 新しいポケふたが追加されたら、このスクリプトを実行するだけで全成果物が更新される:
   python3 scripts/fetch_pokefuta.py
 """
-import urllib.request
-import re
-import json
 import html
+import json
+import re
 import sys
-from pathlib import Path
+import time
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 BASE = "https://local.pokemon.jp"
-MAX_ID = 500  # 現行の最大は 480。追加分を自動検出できるよう少し上まで走査する。
+# 既存データの最大 ID からこの件数だけ先まで走査して、新規追加を自動検出する
+SCAN_MARGIN = 100
 ROOT = Path(__file__).resolve().parent.parent
+CANONICAL = ROOT / "data" / "pokefuta.json"
 
 # 公式データが不正確で手動修正しているため、fetch で上書きしないポケふた。
 # 既存の data/pokefuta.json の該当レコードをそのまま引き継ぐ。
@@ -32,13 +37,20 @@ PRESERVE: set[int] = {448}
 
 
 def fetch(i: int) -> str:
+    """個別ページの HTML。欠番（404）や 3 回失敗したときは空文字"""
     url = f"{BASE}/manhole/desc/{i}/?is_modal=1"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    for _ in range(3):
+    for attempt in range(3):
         try:
-            return urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
-        except Exception:
-            continue
+            with urllib.request.urlopen(req, timeout=30) as res:
+                return res.read().decode("utf-8", "ignore")
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return ""
+        except (urllib.error.URLError, TimeoutError):
+            pass
+        time.sleep(2**attempt)
+    print(f"取得失敗: No.{i}", file=sys.stderr)
     return ""
 
 
@@ -85,29 +97,30 @@ def work(i: int):
     return parse(i, h) if h else None
 
 
+def load_existing() -> dict[int, dict]:
+    if not CANONICAL.exists():
+        return {}
+    return {r["no"]: r for r in json.loads(CANONICAL.read_text(encoding="utf-8"))}
+
+
 def main():
+    existing = load_existing()
+    max_id = max(existing, default=0) + SCAN_MARGIN
     with ThreadPoolExecutor(max_workers=8) as ex:
-        recs = [r for r in ex.map(work, range(1, MAX_ID + 1)) if r]
+        recs = [r for r in ex.map(work, range(1, max_id + 1)) if r]
+    if not recs:
+        sys.exit("1件も取得できませんでした（公式サイトの構造変更・障害の可能性）")
     recs.sort(key=lambda r: r["no"])
-    print(f"取得件数: {len(recs)}  (ID {recs[0]['no']}..{recs[-1]['no']})", file=sys.stderr)
+    print(f"取得件数: {len(recs)}  (ID {recs[0]['no']}..{recs[-1]['no']}, 走査 1..{max_id})", file=sys.stderr)
 
-    data_dir = ROOT / "data"
-    data_dir.mkdir(exist_ok=True)
+    # 手動修正済みレコードは既存データから引き継ぐ（上書きしない）
+    kept = sorted(n for n in PRESERVE if n in existing)
+    recs = [existing[r["no"]] if r["no"] in kept else r for r in recs]
+    if kept:
+        print(f"手動修正を保持: {kept}", file=sys.stderr)
 
-    # 手動修正済みレコードは既存の canonical データから引き継ぐ（上書きしない）
-    canonical = data_dir / "pokefuta.json"
-    if PRESERVE and canonical.exists():
-        existing = {r["no"]: r for r in json.loads(canonical.read_text(encoding="utf-8"))}
-        kept = [n for n in PRESERVE if n in existing]
-        recs = [existing[r["no"]] if r["no"] in PRESERVE and r["no"] in existing else r
-                for r in recs]
-        if kept:
-            print(f"手動修正を保持: {sorted(kept)}", file=sys.stderr)
-
-    canonical.write_text(
-        json.dumps(recs, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
-    )
-
+    CANONICAL.parent.mkdir(exist_ok=True)
+    CANONICAL.write_text(json.dumps(recs, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print("生成: data/pokefuta.json", file=sys.stderr)
 
 

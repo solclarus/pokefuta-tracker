@@ -1,3 +1,5 @@
+import type { Item } from "../types";
+
 // 都道府県 -> 地方（6区分：公式のエリア分けに準拠）
 export const REGION_ORDER = [
   "北海道・東北",
@@ -25,4 +27,33 @@ const MAP: Record<string, Region> = {
 
 export function regionOf(pref: string): Region {
   return MAP[pref] ?? "九州・沖縄";
+}
+
+export const byJa = (a: string, b: string) => a.localeCompare(b, "ja");
+
+export interface PrefGroup {
+  pref: string;
+  items: Item[];
+}
+export interface RegionGroup {
+  region: Region;
+  items: Item[];
+  prefs: PrefGroup[];
+}
+
+/** 地方 → 都道府県（五十音順）にまとめる。アイテムのない地方は含めない */
+export function groupByRegion(items: Item[]): RegionGroup[] {
+  const m = new Map<Region, Map<string, Item[]>>();
+  for (const r of items) {
+    const reg = regionOf(r.pref);
+    const prefs = m.get(reg) ?? new Map<string, Item[]>();
+    prefs.set(r.pref, [...(prefs.get(r.pref) ?? []), r]);
+    m.set(reg, prefs);
+  }
+  return REGION_ORDER.filter((reg) => m.has(reg)).map((region) => {
+    const prefs = [...m.get(region)!.entries()]
+      .sort((a, b) => byJa(a[0], b[0]))
+      .map(([pref, items]) => ({ pref, items }));
+    return { region, items: prefs.flatMap((p) => p.items), prefs };
+  });
 }

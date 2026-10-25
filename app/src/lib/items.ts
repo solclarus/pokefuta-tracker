@@ -1,6 +1,6 @@
-import pokefutaRaw from "../../data/pokefuta.json";
-import pokecenRaw from "../../data/pokecen.json";
-import type { Category, Item, PokemonRef } from "./types";
+import pokefutaRaw from "../../../data/pokefuta.json";
+import pokecenRaw from "../../../data/pokecen.json";
+import type { Category, Item, PokemonRef } from "../types";
 
 interface PokefutaRaw {
   no: number; pref: string; city: string; addr: string;
@@ -26,10 +26,3 @@ const pokecen: Item[] = (pokecenRaw as PokecenRaw[]).map((r) => ({
 }));
 
 export const ITEMS: Record<Category, Item[]> = { pokefuta, pokecen };
-
-export const CATEGORY_LABEL: Record<Category, string> = {
-  pokefuta: "ポケふた",
-  pokecen: "ポケセン",
-};
-
-export const CATEGORIES: Category[] = ["pokefuta", "pokecen"];

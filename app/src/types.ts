@@ -3,6 +3,17 @@ export type Theme = "dark" | "light";
 export type ViewMode = "map" | "list";
 export type Category = "pokefuta" | "pokecen";
 
+export const CATEGORIES: Category[] = ["pokefuta", "pokecen"];
+
+export const CATEGORY_LABEL: Record<Category, string> = {
+  pokefuta: "ポケふた",
+  pokecen: "ポケセン",
+};
+
+/** 取得済みの番号 → true */
+export type CollectedMap = Record<number, true>;
+export type CollectedAll = Record<Category, CollectedMap>;
+
 /** ポケふたに描かれているポケモン（dex は全国図鑑番号） */
 export interface PokemonRef {
   name: string;

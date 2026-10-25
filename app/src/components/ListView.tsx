@@ -1,22 +1,8 @@
 import { useMemo } from "react";
 import type { Item } from "../types";
 import { useStore } from "../store";
-import { distanceKm, formatKm } from "../utils";
-
-const IconCheck = () => (
-  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6 9 17l-5-5" />
-  </svg>
-);
-
-const Ball = () => (
-  <svg viewBox="0 0 44 44" className="list-ball" aria-hidden>
-    <circle cx="22" cy="22" r="20" fill="#fff" />
-    <path d="M2 22a20 20 0 0 1 40 0z" fill="#ff5470" />
-    <rect x="2" y="19.5" width="40" height="5" fill="#1c212d" />
-    <circle cx="22" cy="22" r="6" fill="#fff" stroke="#1c212d" strokeWidth="3" />
-  </svg>
-);
+import { distanceKm, formatKm } from "../lib/geo";
+import { IconCheck, PokeBall } from "./icons";
 
 export function ListView({ data }: { data: Item[] }) {
   const collected = useStore((s) => s.collected[s.category]);
@@ -26,10 +12,10 @@ export function ListView({ data }: { data: Item[] }) {
 
   // 現在地があれば近い順に並べる
   const rows = useMemo(() => {
-    if (!userPos) return data.map((r) => ({ r, km: null as number | null }));
+    if (!userPos) return data.map((r) => ({ r, km: null }));
     return data
-      .map((r) => ({ r, km: distanceKm(userPos, [r.lat, r.lng]) as number | null }))
-      .sort((a, b) => a.km! - b.km!);
+      .map((r) => ({ r, km: distanceKm(userPos, [r.lat, r.lng]) }))
+      .sort((a, b) => a.km - b.km);
   }, [data, userPos]);
 
   return (
@@ -48,7 +34,7 @@ export function ListView({ data }: { data: Item[] }) {
                   <img className="list-thumb" src={r.thumb} loading="lazy" alt="" />
                 ) : (
                   <span className="list-thumb list-thumb-ball">
-                    <Ball />
+                    <PokeBall className="list-ball" />
                   </span>
                 )}
                 <span className="list-text">
@@ -66,7 +52,7 @@ export function ListView({ data }: { data: Item[] }) {
                 aria-label={done ? "取得済み" : "取得済みにする"}
                 title={done ? "取得済み" : "取得済みにする"}
               >
-                <IconCheck />
+                <IconCheck size={16} strokeWidth={2.6} />
               </button>
             </li>
           );

@@ -4,16 +4,14 @@ import L from "leaflet";
 import "leaflet.markercluster";
 import type { Category, Item } from "../types";
 import { useStore } from "../store";
-import { TILE } from "../tiles";
+import { TILE } from "../lib/tiles";
+import { BALL_SVG } from "./icons";
 
-
-// ポケセン用のポケボール型ピン（画像を持たないアイテム向け）
-const BALL = `<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="#fff"/><path d="M2 22a20 20 0 0 1 40 0z" fill="#ff5470"/><rect x="2" y="19.5" width="40" height="5" fill="#1c212d"/><circle cx="22" cy="22" r="6" fill="#fff" stroke="#1c212d" stroke-width="3"/></svg>`;
 
 function pinIcon(rec: Item, done: boolean) {
   const inner = rec.img
     ? `<img src="${rec.thumb}" loading="lazy" onerror="this.src='${rec.img}'" />`
-    : `<span class="ball">${BALL}</span>`;
+    : `<span class="ball">${BALL_SVG}</span>`;
   return L.divIcon({
     className: "",
     html: `<div class="pin ${done ? "done" : ""}">${inner}<span class="tip"></span></div>`,

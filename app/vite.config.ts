@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
-import { TILE } from "./src/tiles";
+import { TILE } from "./src/lib/tiles";
 
 export default defineConfig({
   // dev サーバがリポジトリ直下の data/ を import できるようにする

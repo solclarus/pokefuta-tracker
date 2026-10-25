@@ -4,7 +4,6 @@
 
     python scripts/report_changes.py OLD.json NEW.json
 
-追加・削除があれば末尾に "changed" と表示（終了コード 0）。
 CI からは stdout をコミット本文 / Issue 本文 / ジョブサマリに流用する。
 """
 import json

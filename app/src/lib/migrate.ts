@@ -1,4 +1,4 @@
-import type { CollectedMap } from "./backup";
+import type { CollectedMap } from "../types";
 
 /** 保存データの移行。v1 はポケふたのみのフラットな { [no]: true } だった */
 export function migrateState(persisted: unknown, version: number): unknown {

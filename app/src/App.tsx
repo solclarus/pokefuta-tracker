@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
-import { ITEMS } from "./items";
-import type { Item } from "./types";
+import { ITEMS } from "./lib/items";
+import { filterItems } from "./lib/filter";
 import { useStore } from "./store";
 import { Hud } from "./components/Hud";
 import { MapView } from "./components/MapView";
@@ -11,20 +11,17 @@ import { StatsPanel } from "./components/StatsPanel";
 import { FilterPanel } from "./components/FilterPanel";
 import { GeoWatcher } from "./components/GeoWatcher";
 import { Toast } from "./components/Toast";
-import { cityKey } from "./utils";
-
-const searchText = (r: Item) =>
-  (r.pref + r.city + r.addr + (r.name ?? "") + (r.pokemon?.map((p) => p.name).join("") ?? "")).toLowerCase();
 
 export default function App() {
   const theme = useStore((s) => s.theme);
   const category = useStore((s) => s.category);
-  const filter = useStore((s) => s.filter);
+  const mode = useStore((s) => s.filter);
   const query = useStore((s) => s.query);
-  const selectedPrefs = useStore((s) => s.selectedPrefs);
-  const selectedCities = useStore((s) => s.selectedCities);
+  const prefs = useStore((s) => s.selectedPrefs);
+  const cities = useStore((s) => s.selectedCities);
   const collected = useStore((s) => s.collected[s.category]);
   const view = useStore((s) => s.view);
+  const selected = useStore((s) => s.selected);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -32,23 +29,11 @@ export default function App() {
   }, [theme]);
 
   const data = ITEMS[category];
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return data.filter((r) => {
-      const done = !!collected[r.no];
-      if (filter === "done" && !done) return false;
-      if (filter === "todo" && done) return false;
-      if (selectedPrefs.length && !selectedPrefs.includes(r.pref)) return false;
-      if (selectedCities.length && !selectedCities.includes(cityKey(r.pref, r.city))) return false;
-      if (q && !searchText(r).includes(q)) return false;
-      return true;
-    });
-  }, [data, filter, query, selectedPrefs, selectedCities, collected]);
-
-  const selectedRec = useStore((s) =>
-    s.selected == null ? null : ITEMS[s.category].find((r) => r.no === s.selected) ?? null
+  const filtered = useMemo(
+    () => filterItems(data, collected, { mode, query, prefs, cities }),
+    [data, collected, mode, query, prefs, cities]
   );
+  const selectedRec = selected == null ? null : (data.find((r) => r.no === selected) ?? null);
 
   return (
     <div className="app">

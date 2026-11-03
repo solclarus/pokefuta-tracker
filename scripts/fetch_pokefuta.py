@@ -97,6 +97,18 @@ def work(i: int):
     return parse(i, h) if h else None
 
 
+def under_maintenance() -> bool:
+    """公式サイトがメンテナンス中（503）なら True。走査の前に 1 回だけ確かめる"""
+    req = urllib.request.Request(f"{BASE}/manhole/", headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=30):
+            return False
+    except urllib.error.HTTPError as e:
+        return e.code == 503
+    except (urllib.error.URLError, TimeoutError):
+        return False
+
+
 def load_existing() -> dict[int, dict]:
     if not CANONICAL.exists():
         return {}
@@ -104,6 +116,10 @@ def load_existing() -> dict[int, dict]:
 
 
 def main():
+    # メンテナンス中は失敗扱いにせず、既存データのまま終える（毎日の失敗通知を避ける）
+    if under_maintenance():
+        print("公式サイトがメンテナンス中（503）のため更新をスキップ", file=sys.stderr)
+        return
     existing = load_existing()
     max_id = max(existing, default=0) + SCAN_MARGIN
     with ThreadPoolExecutor(max_workers=8) as ex:

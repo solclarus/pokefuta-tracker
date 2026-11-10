@@ -9839,9 +9839,9 @@
   "no": 487,
   "pref": "沖縄県",
   "city": "国頭村",
-  "addr": "沖縄県国頭村字辺戸岬原973番1の一部",
-  "lat": 26.872162,
-  "lng": 128.264672,
+  "addr": "沖縄県国頭村辺戸９３７",
+  "lat": 26.87221,
+  "lng": 128.264718,
   "pokemon": [
    {
     "name": "ガーディ",
@@ -9918,5 +9918,213 @@
   ],
   "img": "https://local.pokemon.jp/img/p/manhole/692b4dc5772e4a42da8117ac26f2fdda_l.png",
   "thumb": "https://local.pokemon.jp/img/p/manhole/692b4dc5772e4a42da8117ac26f2fdda_s.png"
+ },
+ {
+  "no": 491,
+  "pref": "高知県",
+  "city": "土佐市",
+  "addr": "高知県土佐市高岡町甲2017-1",
+  "lat": 33.495986,
+  "lng": 133.425551,
+  "pokemon": [
+   {
+    "name": "ヌオー",
+    "dex": 195
+   },
+   {
+    "name": "ジジーロン",
+    "dex": 780
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/a7bf75de1464cafe2e899f9a9846ebcd_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/a7bf75de1464cafe2e899f9a9846ebcd_s.png"
+ },
+ {
+  "no": 492,
+  "pref": "高知県",
+  "city": "四万十市",
+  "addr": "高知県四万十市駅前町8-3",
+  "lat": 32.984011,
+  "lng": 132.944202,
+  "pokemon": [
+   {
+    "name": "ヌオー",
+    "dex": 195
+   },
+   {
+    "name": "メガヤンマ",
+    "dex": 469
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/0510daf2e1728f2b1e5931db32e1d72f_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/0510daf2e1728f2b1e5931db32e1d72f_s.png"
+ },
+ {
+  "no": 493,
+  "pref": "高知県",
+  "city": "芸西村",
+  "addr": "高知県芸西村和食甲４５１",
+  "lat": 33.519002,
+  "lng": 133.800235,
+  "pokemon": [
+   {
+    "name": "ヌオー",
+    "dex": 195
+   },
+   {
+    "name": "フラエッテ",
+    "dex": 670
+   },
+   {
+    "name": "ピッピ",
+    "dex": 35
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/77beaceac75f4b25be9d8a9b927618c0_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/77beaceac75f4b25be9d8a9b927618c0_s.png"
+ },
+ {
+  "no": 494,
+  "pref": "高知県",
+  "city": "いの町",
+  "addr": "高知県いの町新町（JR伊野駅ロータリー）",
+  "lat": 33.547787,
+  "lng": 133.4302173,
+  "pokemon": [
+   {
+    "name": "ヌオー",
+    "dex": 195
+   },
+   {
+    "name": "ウパー",
+    "dex": 194
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/c2fc4a03a9ddd75d66cdb4201b3c24cc_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/c2fc4a03a9ddd75d66cdb4201b3c24cc_s.png"
+ },
+ {
+  "no": 495,
+  "pref": "高知県",
+  "city": "佐川町",
+  "addr": "高知県佐川町加茂2711-1",
+  "lat": 33.503128,
+  "lng": 133.317008,
+  "pokemon": [
+   {
+    "name": "ヌオー",
+    "dex": 195
+   },
+   {
+    "name": "ポポッコ",
+    "dex": 188
+   },
+   {
+    "name": "ゾウドウ",
+    "dex": 878
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/e6b77c917f9959cbe6320565b3cbd361_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/e6b77c917f9959cbe6320565b3cbd361_s.png"
+ },
+ {
+  "no": 496,
+  "pref": "群馬県",
+  "city": "沼田市",
+  "addr": "群馬県沼田市利根町追貝1005-1",
+  "lat": 36.699986,
+  "lng": 139.208649,
+  "pokemon": [
+   {
+    "name": "ノココッチ",
+    "dex": 982
+   },
+   {
+    "name": "ダーテング",
+    "dex": 275
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/eabc71ac59552a17b9931a44866e6dcb_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/eabc71ac59552a17b9931a44866e6dcb_s.png"
+ },
+ {
+  "no": 497,
+  "pref": "群馬県",
+  "city": "館林市",
+  "addr": "群馬県館林市花山町3181",
+  "lat": 36.241375,
+  "lng": 139.55104,
+  "pokemon": [
+   {
+    "name": "ジグザグマ",
+    "dex": 263
+   },
+   {
+    "name": "ガラルジグザグマ",
+    "dex": 263
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/ad43bc051cd5f1984730e863794e9cf9_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/ad43bc051cd5f1984730e863794e9cf9_s.png"
+ },
+ {
+  "no": 498,
+  "pref": "群馬県",
+  "city": "渋川市",
+  "addr": "群馬県渋川市伊香保町伊香保560番地1",
+  "lat": 36.49717728,
+  "lng": 138.9192351,
+  "pokemon": [
+   {
+    "name": "サンダー",
+    "dex": 145
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/865f19a7112a16fa3b88eda62b686e5f_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/865f19a7112a16fa3b88eda62b686e5f_s.png"
+ },
+ {
+  "no": 499,
+  "pref": "群馬県",
+  "city": "下仁田町",
+  "addr": "群馬県下仁田町大字下仁田381-2",
+  "lat": 36.210725,
+  "lng": 138.787017,
+  "pokemon": [
+   {
+    "name": "カモネギ",
+    "dex": 83
+   },
+   {
+    "name": "ネギガナイト",
+    "dex": 865
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/4881d33c7f04e11367f22e6b081c6e55_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/4881d33c7f04e11367f22e6b081c6e55_s.png"
+ },
+ {
+  "no": 500,
+  "pref": "群馬県",
+  "city": "長野原町",
+  "addr": "群馬県長野原町林1567-4",
+  "lat": 36.547169,
+  "lng": 138.684549,
+  "pokemon": [
+   {
+    "name": "パルスワン",
+    "dex": 836
+   },
+   {
+    "name": "メルタン",
+    "dex": 808
+   },
+   {
+    "name": "アズマオウ",
+    "dex": 119
+   }
+  ],
+  "img": "https://local.pokemon.jp/img/p/manhole/5dbab683b67538f7d0478d89f4711ab5_l.png",
+  "thumb": "https://local.pokemon.jp/img/p/manhole/5dbab683b67538f7d0478d89f4711ab5_s.png"
  }
 ]
